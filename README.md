@@ -1,83 +1,114 @@
 # Plateforme e-learning en marque blanche (prototype)
 
-Prototype de plateforme de formation pour organismes de formation. **Données fictives uniquement.**
+Plateforme de formation pour organismes de formation : chaque organisme a son espace, à ses couleurs, avec des parcours, des quiz, du suivi et une attestation de fin de formation. **Prototype de démonstration : données fictives uniquement.**
+
+> Pour présenter la plateforme à un prospect : voir [`docs/scenario-demo.md`](docs/scenario-demo.md).
+> Pour l'organisation technique, les décisions et la feuille de route : voir [`CLAUDE.md`](CLAUDE.md).
 
 ## 1. Prérequis (à installer une seule fois)
+
 - **Node.js** (version 20 ou plus) : https://nodejs.org → télécharger la version « LTS » et l'installer.
 - **Git** : sur Mac, tape `git --version` dans le Terminal ; s'il n'est pas installé, le Mac te proposera de l'installer. Sur Windows : https://git-scm.com
 - **VS Code** (éditeur de texte, facultatif mais pratique) : https://code.visualstudio.com
+- Un compte gratuit **Supabase** (https://supabase.com) : c'est lui qui héberge la base de données et les connexions.
 
-Pour vérifier, ouvre le **Terminal** (Mac : Cmd + Espace, tape « Terminal » ; Windows : menu Démarrer, tape « PowerShell ») et tape :
+Pour vérifier, ouvre le **Terminal** (Mac : Cmd + Espace, tape « Terminal » ; Windows : menu Démarrer, tape « PowerShell ») :
+
 ```bash
 node -v
 git --version
 ```
+
 Chaque commande doit afficher un numéro de version.
 
-## 2. Lancer le projet en local
+## 2. Préparer Supabase (une seule fois)
+
+1. Crée un projet Supabase : région **Paris** ou **Francfort** (données en Union européenne), plan gratuit.
+2. Dans **Project Settings → API Keys**, repère le **Project URL** et la clé **Publishable** (commence par `sb_publishable_`). Ne copie **jamais** la clé « secret ».
+3. Copie `.env.example` en `.env.local`, puis colle ces deux valeurs :
+
+```
+NEXT_PUBLIC_SUPABASE_URL="https://xxxxxxxx.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="sb_publishable_..."
+```
+
+Ce fichier ne part jamais sur Git. Sur un nouvel ordinateur, il faut le recréer.
+
+4. Dans Supabase, ouvre **SQL Editor → New query**, colle le contenu de chacun de ces fichiers **dans cet ordre**, et clique sur **Run** à chaque fois (tu dois voir « Success ») :
+
+| # | Fichier | Rôle |
+|---|---|---|
+| 1 | `supabase/migrations/0001_organizations_and_profiles.sql` | Organismes, utilisateurs, règles d'isolation |
+| 2 | `supabase/seed.sql` | 2 organismes fictifs et 6 comptes de démo |
+| 3 | `supabase/migrations/0002_logos_storage.sql` | Stockage des logos |
+| 4 | `supabase/migrations/0003_courses.sql` | Parcours, modules, contenus |
+| 5 | `supabase/seed_courses.sql` | 6 parcours fictifs (« lorem ipsum ») |
+| 6 | `supabase/migrations/0004_quizzes.sql` | Quiz et calcul des scores |
+| 7 | `supabase/seed_quizzes.sql` | 3 quiz fictifs |
+| 8 | `supabase/migrations/0005_tracking.sql` | Suivi, temps passé, mentions légales |
+| 9 | `supabase/seed_tracking.sql` | 3 apprenants de plus, activité et mentions fictives |
+
+> Astuce Mac : `cat fichier.sql | LC_ALL=en_US.UTF-8 pbcopy` copie le fichier dans le presse-papiers en gardant les accents. Colle ensuite avec Cmd + V.
+> Les projets Supabase gratuits s'endorment après environ 7 jours sans activité : dans ce cas, clique sur **Restore** dans leur tableau de bord.
+
+## 3. Lancer le projet en local
+
 Dans le Terminal, place-toi dans le dossier du projet (`cd` = « aller dans ce dossier ») :
+
 ```bash
 cd chemin/vers/plateforme-elearning
 npm install
 npm run dev
 ```
-`npm install` télécharge les briques nécessaires (à faire une fois). `npm run dev` démarre l'application. Ouvre ensuite http://localhost:3000 dans ton navigateur : tu dois voir « Plateforme e-learning ». Pour arrêter : `Ctrl + C` dans le Terminal.
 
-## 3. Lancer les tests
-```bash
-npm test
-```
-Tu dois voir « 1 passed » (le nombre augmentera à chaque étape). Autres vérifications : `npm run typecheck`, `npm run lint`, `npm run build`.
+`npm install` télécharge les briques nécessaires (à faire une fois). `npm run dev` démarre l'application : ouvre http://localhost:3000. Pour arrêter : `Ctrl + C` dans le Terminal.
 
-## 4. Variables secrètes
-Copie `.env.example` en `.env.local` et remplis-le quand une étape te le demande. Ce fichier ne part jamais sur Git.
+## 4. Comptes de démonstration (données fictives)
 
-## 5. Comptes de démonstration
-Ils seront créés à l'étape 2 (comptes et rôles), puis listés ici.
-
-## Documentation du projet
-Voir `CLAUDE.md` : périmètre, stack, décisions, avancement et feuille de route vers la commercialisation.
-
-## 6. Comptes de démonstration (données fictives)
-Pour te connecter : lance `npm run dev`, ouvre http://localhost:3000 puis « Accéder à mon espace ».
-Il faut avoir appliqué `supabase/migrations/0001_organizations_and_profiles.sql` puis `supabase/seed.sql` dans Supabase (SQL Editor).
-Mot de passe de tous les comptes : `Demo-Elearning-2026!`
+**Mot de passe de tous les comptes :** `Demo-Elearning-2026!`
 
 | Organisme | Rôle | Identifiant |
 |---|---|---|
-| Institut Horizon Formation | Administrateur | admin@horizon.test |
-| Institut Horizon Formation | Formateur | formateur@horizon.test |
-| Institut Horizon Formation | Apprenant | apprenant@horizon.test |
-| Atelier Lumière Conseil | Administrateur | admin@lumiere.test |
-| Atelier Lumière Conseil | Formateur | formateur@lumiere.test |
-| Atelier Lumière Conseil | Apprenant | apprenant@lumiere.test |
+| Institut Horizon Formation (bleu) | Administrateur | `admin@horizon.test` |
+| Institut Horizon Formation | Formateur | `formateur@horizon.test` |
+| Institut Horizon Formation | Apprenant | `apprenant@horizon.test` (Léa), `thomas@horizon.test`, `camille@horizon.test` |
+| Atelier Lumière Conseil (orange) | Administrateur | `admin@lumiere.test` |
+| Atelier Lumière Conseil | Formateur | `formateur@lumiere.test` |
+| Atelier Lumière Conseil | Apprenant | `apprenant@lumiere.test` (Inès), `julien@lumiere.test` |
 
-## 7. Test d'isolation entre organismes
+Ce que chaque rôle voit :
+
+- **Apprenant** : « Mes formations » (parcours publiés, progression), lecture, bouton « Marquer comme terminé », quiz, téléchargement de l'attestation quand le parcours est terminé.
+- **Formateur** : « Mes parcours » (créer, modifier, réordonner, publier, quiz) et « Apprenants et suivi » (tableau, exports CSV, attestations).
+- **Administrateur** : tout ce que fait le formateur, plus « Paramètres de l'organisme » (nom, couleur, logo, numéro de déclaration d'activité, signataire).
+
+## 5. Lancer les tests
+
 ```bash
-npm run test:isolation
+npm test                 # tests rapides de la logique (aucune connexion nécessaire)
+npm run test:isolation   # tests sur ta vraie base Supabase : isolation, droits, scores, suivi
+npm run typecheck        # vérification des types
+npm run lint             # vérification du style du code
+npm run build            # construction de la version de production
 ```
-Ce test se connecte à ta vraie base Supabase avec chaque compte et vérifie que personne ne voit les données d'un autre organisme. Il faut `.env.local` rempli. Tu dois voir « 5 passed ».
 
-## 8. Personnaliser un organisme (marque blanche)
-Connecte-toi en **administrateur** (`admin@horizon.test`), ouvre « Paramètres de l'organisme » : change le nom, la couleur et le logo, puis « Enregistrer ». Toute l'interface de cet organisme change ; l'autre organisme reste inchangé.
-Le logo (PNG, JPEG ou WebP, 1 Mo) peut être remplacé ou retiré (case « Retirer le logo actuel »). Prérequis : avoir appliqué `supabase/migrations/0002_logos_storage.sql` dans le SQL Editor de Supabase.
+`npm test` doit afficher « passed » partout. `npm run test:isolation` nécessite `.env.local` rempli et les scripts SQL appliqués ; il crée des données temporaires qu'il supprime à la fin. Si tu vois « 429 », Supabase limite les connexions rapprochées : attends 5 minutes.
 
-## 9. Parcours (étape 4)
-Applique dans le SQL Editor de Supabase : `supabase/migrations/0003_courses.sql` puis `supabase/seed_courses.sql` (parcours fictifs en « lorem ipsum »).
-- **Formateur / administrateur** : menu « Mes parcours » → créer un parcours, ajouter / renommer des modules, ajouter, modifier ou supprimer des contenus (texte, vidéo YouTube/Vimeo, PDF) affichés comme les voit l'apprenant, publier ou repasser en brouillon, « Aperçu apprenant ».
-- **Apprenant** (`apprenant@horizon.test`) : voit uniquement les parcours **publiés** de son organisme. Le parcours « Introduction au management d'équipe » est un brouillon : il n'apparaît pas pour lui.
+## 6. Rejouer la démo à zéro
 
-## 10. Quiz (étape 5)
-Applique dans le SQL Editor de Supabase : `supabase/migrations/0004_quizzes.sql` puis `supabase/seed_quizzes.sql` (3 quiz fictifs).
-- **Formateur / administrateur** : sur la page d'un parcours, à la fin de chaque module, « Ajouter un quiz à ce module » : titre, seuil de réussite (%), nombre de tentatives (vide = illimité), correction affichée ou non ; puis « Ajouter une question » (choix unique, choix multiple, vrai/faux).
-- **Apprenant** : la carte du quiz apparaît à la fin du module ; il répond, voit son score, « réussi / non réussi », et la correction si elle est activée.
-- **Règle de notation** : 1 point par question ; une question est juste seulement si les bonnes réponses sont **exactement** cochées. Score = bonnes questions ÷ total ; réussite si score ≥ seuil.
-- `npm run test:isolation` vérifie aussi, sur ta vraie base, le calcul des scores, le seuil, la limite de tentatives et l'invisibilité des bonnes réponses.
+Entre deux démos (tentatives de quiz limitées, couleurs modifiées), dans le SQL Editor : lance `supabase/reset_demo.sql`, puis `supabase/seed_tracking.sql`. Voir [`docs/scenario-demo.md`](docs/scenario-demo.md).
 
-## 11. Suivi, exports et attestation (étape 6)
-Applique dans le SQL Editor de Supabase : `supabase/migrations/0005_tracking.sql` puis `supabase/seed_tracking.sql` (3 apprenants fictifs en plus : `thomas@horizon.test`, `camille@horizon.test`, `julien@lumiere.test`, avec de l'activité variée).
-- **Apprenant** : sur un parcours, bouton « Marquer comme terminé » sous chaque contenu ; barre de progression ; temps passé ; une fois 100 % atteint (contenus terminés et quiz réussis), bouton « Télécharger mon attestation ».
-- **Formateur / administrateur** : menu « Apprenants et suivi » : tableau (statut, progression, temps, quiz, dernière activité), boutons « Export du suivi (CSV) » et « Résultats aux quiz (CSV) », et un lien PDF d'attestation pour chaque parcours terminé.
-- **Administrateur** : « Paramètres de l'organisme » → mentions de l'attestation (numéro de déclaration d'activité, nom et fonction du signataire).
-- Les fichiers CSV s'ouvrent directement dans Excel (accents corrects). Les numéros d'activité de démonstration sont fictifs.
-- ⚠️ Le temps passé mesure la présence active à l'écran : c'est une indication, pas une preuve d'assiduité.
+## 7. Sur un nouvel ordinateur (Windows par exemple)
+
+1. Installe Node.js, Git et VS Code (section 1).
+2. Récupère le dossier du projet (dépôt Git, ou archive zip sans `node_modules`).
+3. Recrée `.env.local` (section 2) : il n'est jamais envoyé avec le code.
+4. `npm install`, puis `npm run dev`. La base Supabase est la même : rien à réappliquer.
+
+## 8. Variables d'environnement
+
+| Variable | Rôle |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Adresse du projet Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé « publishable » Supabase (jamais la clé secret) |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | Adresse affichée sur la page d'accueil pour « Demander une démonstration » (facultatif) |

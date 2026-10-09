@@ -44,7 +44,9 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 - [x] **Étape 4** — Création de parcours : parcours, modules, contenus texte / vidéo (YouTube, Vimeo) / PDF, publication, aperçu apprenant, parcours fictifs lorem (`supabase/seed_courses.sql`) — 2026-10-09
 - [x] **Étape 5** — Quiz : choix unique / multiple / vrai-faux, seuil et tentatives paramétrables, correction affichable ou non, score calculé dans la base, bonnes réponses invisibles aux apprenants, 3 quiz fictifs (`supabase/seed_quizzes.sql`). Ajouts : modification du titre/durée/objectifs d'un parcours, réordonnancement des modules et contenus — 2026-10-09
 - [x] **Étape 6** — Suivi et traces Qualiopi : contenus terminés, temps passé (plafonné côté base), avancement et statut par parcours, tableau de suivi, export CSV (suivi + résultats aux quiz), attestation de fin de parcours en PDF, mentions légales de l'organisme, apprenants et activité fictifs (`supabase/seed_tracking.sql`) — 2026-10-09
-- [ ] Étape 7 — Données de démo, page d'accueil publique légère, scénario de démo prospect
+- [x] **Étape 7** — Page d'accueil publique légère, scénario de démo prospect (`docs/scenario-demo.md`), remise à zéro de la démo (`supabase/reset_demo.sql`), jeu de données de démonstration complet — 2026-10-09
+
+**Le prototype des 5 fonctionnalités est complet.** Prochaine phase : démos auprès de 10-15 prospects, puis la feuille de route ci-dessous avec un développeur professionnel.
 
 ## Journal des décisions
 | Date | Décision | Raison |
@@ -73,6 +75,8 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Exports CSV : séparateur « ; », UTF-8 avec BOM, cellules neutralisées contre l'injection de formules | Ouverture directe dans Excel français, sans faille d'injection |
 | 2026-10-09 | Attestation PDF générée avec pdf-lib, mentions : organisme + n° de déclaration d'activité, apprenant, parcours, durée prévue / connexion, période, objectifs, évaluations, signataire | Base validée par Mélissa, à peaufiner |
 | 2026-10-09 | Tests réels : jetons de connexion mis en cache (`tests/auth-helper.ts`) | Supabase limite les connexions rapprochées (erreur 429) |
+| 2026-10-09 | Page d'accueil publique légère : textes sans chiffre ni témoignage inventé ; contact par lien mailto (adresse dans `NEXT_PUBLIC_CONTACT_EMAIL`), aucun formulaire ni donnée collectée | Éviter toute allégation non vérifiable et tout traitement de données personnelles avant le RGPD |
+| 2026-10-09 | Script `supabase/reset_demo.sql` limité aux deux organismes fictifs | Rejouer la démo à l'identique (tentatives de quiz limitées, couleurs modifiées en direct) |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
@@ -82,15 +86,24 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 - Sous-domaine par organisme, nom de domaine personnalisé
 
 ## Feuille de route vers la commercialisation
-Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE.
-1. ⚠️ **RGPD** : registre de traitements, information et consentement, droit à l'effacement, contrats de sous-traitance (Supabase, Vercel), politique de confidentialité. Obligatoire avant tout pilote avec de vrais apprenants autres que Mélissa.
-2. ⚠️ **Sécurité** : audit de l'isolation entre organismes, politique de mots de passe, double authentification, sauvegardes, journal d'accès.
-3. ⚠️ **Suivi et attestation** : mentions de l'attestation et colonnes des exports À VALIDER avec Mélissa (et un auditeur Qualiopi) ; le temps passé mesure la présence active à l'écran (approximation, pas une preuve d'assiduité) ; « contenu terminé » est déclaratif ; pas de modèle d'attestation personnalisable, pas de numérotation ni de registre des attestations émises, pas de signature électronique ; pas d'émargement ni d'évaluations à chaud / à froid ; durée de conservation des traces et droit à l'effacement (RGPD) à définir ; webp non géré pour le logo du PDF.
-3. ⚠️ **Quiz** : règle de notation à valider avec Mélissa (points partiels ? pondération ? questions obligatoires ?) ; questions non modifiables après création (supprimer puis recréer) et non réordonnables ; pas de banque de questions, de tirage aléatoire ni de limite de temps ; tentatives non supprimables (RGPD : droit à l'effacement à prévoir) ; audit de la fonction `submit_quiz_attempt`.
-3. ⚠️ **Parcours** : suppression d'un module ou d'un parcours = fichiers PDF laissés orphelins dans le stockage ; un PDF est lisible par tout membre de l'organisme connaissant son chemin (contrôle d'accès au niveau du parcours à ajouter) ; pas de réorganisation des modules/contenus ; pas de modification du titre, de la durée ni des objectifs d'un parcours existant ; pas de pagination.
-3. ⚠️ **Logos** : les anciens logos ne sont pas supprimés (fichiers orphelins) ; pas de redimensionnement ni d'analyse des images envoyées ; thème clair uniquement (pas de mode sombre) ; accessibilité des contrastes à auditer (RGAA).
-3. ⚠️ **Comptes de démo** : mot de passe unique et simple, à supprimer avant toute mise en production ; tables auth alimentées par SQL direct (démo uniquement).
-3. ⚠️ **Dépendances de développement** : `npm audit` signale 5 vulnérabilités « high » dans l'outil de lint (`eslint-config-next` → `braces`). Sans effet en production ; à traiter à la prochaine montée de version.
-4. ⚠️ **Hébergement de production** : environnements séparés, supervision, plan de reprise, domaine.
-5. ⚠️ **Conformité Qualiopi** : valider attestation et indicateurs avec Mélissa, voire un auditeur.
-6. ⚠️ SCORM / xAPI · ⚠️ Accessibilité RGAA · ⚠️ Performance à l'échelle · ⚠️ Facturation et e-mails · ⚠️ CGV / CGU.
+Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE. À traiter avec un développeur professionnel.
+
+### Priorité 1 — Obligatoire avant tout pilote avec de vrais apprenants
+1. ⚠️ **RGPD** : registre des traitements, information des personnes, droit d'accès / effacement (y compris tentatives de quiz et traces), durée de conservation, contrats de sous-traitance (Supabase, Vercel), politique de confidentialité, mentions légales du site.
+2. ⚠️ **Sécurité** : audit de l'isolation entre organismes (règles RLS et fonctions SQL `submit_quiz_attempt`, `mark_content_done`, `track_course_time`), politique de mots de passe, double authentification, « mot de passe oublié », invitation des utilisateurs par e-mail (aujourd'hui : création par SQL), limitation des tentatives de connexion, sauvegardes, journal d'accès.
+3. ⚠️ **Comptes de démo** : mot de passe unique et simple, tables d'authentification alimentées par SQL direct : à supprimer avant toute mise en production.
+
+### Priorité 2 — Avant la mise en vente
+4. ⚠️ **Conformité Qualiopi et attestation** : mentions de l'attestation et colonnes des exports à valider avec Mélissa et un auditeur ; registre numéroté des attestations émises ; signature électronique ; modèle personnalisable ; évaluations à chaud / à froid ; émargement.
+5. ⚠️ **Fiabilité des traces** : le temps passé mesure la présence active à l'écran (approximation, pas une preuve d'assiduité) ; « contenu terminé » est déclaratif ; la règle d'avancement est à valider.
+6. ⚠️ **Quiz** : règle de notation à valider (points partiels ? pondération ?) ; questions non modifiables ni réordonnables après création ; pas de banque de questions, de tirage aléatoire ni de chronomètre.
+7. ⚠️ **Hébergement de production** : environnements séparés (test / production), supervision, plan de reprise, nom de domaine, sous-domaine par organisme, e-mails transactionnels.
+8. ⚠️ **Fichiers** : suppression d'un module / parcours = PDF et anciens logos laissés dans le stockage ; un PDF est lisible par tout membre de l'organisme qui connaît son chemin (contrôle d'accès au niveau du parcours à ajouter) ; pas de redimensionnement ni d'analyse antivirus des fichiers envoyés ; WebP non géré dans le PDF.
+9. ⚠️ **Page d'accueil publique** : textes commerciaux, tarifs, mentions légales, adresse de contact réelle.
+
+### Priorité 3 — Qualité et croissance
+10. ⚠️ **Accessibilité (RGAA)** : audit complet (contrastes des couleurs choisies par les organismes, navigation au clavier, lecteurs d'écran) ; thème clair uniquement (pas de mode sombre).
+11. ⚠️ **Performance à l'échelle** : pagination des listes, index, mise en cache, volumétrie.
+12. ⚠️ **Tests de bout en bout** (Playwright) en plus des tests unitaires et des tests sur base réelle ; la mesure du temps passé n'est pas testée dans un navigateur.
+13. ⚠️ **Dépendances de développement** : `npm audit` signale 5 vulnérabilités « high » dans l'outil de lint (`eslint-config-next` → `braces`), sans effet en production ; à traiter à la prochaine montée de version.
+14. ⚠️ SCORM / xAPI · facturation et abonnements · CGV / CGU · notifications e-mail · application mobile.

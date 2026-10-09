@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Plateforme e-learning",
-  description: "Plateforme de formation en marque blanche",
+  description: "Plateforme de formation en marque blanche pour organismes de formation : parcours, quiz, suivi et attestations.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
