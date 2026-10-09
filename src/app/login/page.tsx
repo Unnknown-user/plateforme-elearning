@@ -10,7 +10,7 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-6">
       <form action={action} className="w-full max-w-sm space-y-4 rounded-lg bg-white p-6 shadow">
         <h1 className="text-xl font-semibold">Connexion</h1>
-        <label className="block text-sm">
+        <label className="block text-sm font-medium text-zinc-900">
           E-mail
           <input
             name="email"
@@ -19,17 +19,17 @@ export default function LoginPage() {
             autoComplete="email"
             defaultValue={state.email}
             key={state.email}
-            className="mt-1 w-full rounded border p-2"
+            className="mt-1 w-full rounded border border-zinc-400 bg-white p-2 text-zinc-900"
           />
         </label>
-        <label className="block text-sm">
+        <label className="block text-sm font-medium text-zinc-900">
           Mot de passe
           <input
             name="password"
             type="password"
             required
             autoComplete="current-password"
-            className="mt-1 w-full rounded border p-2"
+            className="mt-1 w-full rounded border border-zinc-400 bg-white p-2 text-zinc-900"
           />
         </label>
         {state.error && (
