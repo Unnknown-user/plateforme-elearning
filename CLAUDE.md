@@ -63,6 +63,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Parcours > modules > contenus ; l'apprenant ne voit que les parcours publiés (règle dans la base) ; clés composites (id, organization_id) pour interdire tout rattachement entre organismes | Isolation et brouillons garantis par la base, pas seulement par le code |
 | 2026-10-09 | Vidéos : YouTube et Vimeo seulement, intégrées via youtube-nocookie ; PDF 10 Mo en bucket privé, liens temporaires 1 h | Limite le risque (pas de lien arbitraire intégré) et respecte la vie privée |
 | 2026-10-09 | Copie du SQL dans le presse-papiers avec `LC_ALL=en_US.UTF-8 pbcopy` | Sinon les accents sont corrompus (problème rencontré à l'étape 2) |
+| 2026-10-09 | Écran de gestion d'un parcours : chaque contenu est affiché comme chez l'apprenant (même composant), avec « Modifier » et « Supprimer » dessous ; modules renommables | Demande de Mélissa : voir ce que voit l'apprenant en éditant |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
@@ -75,7 +76,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE.
 1. ⚠️ **RGPD** : registre de traitements, information et consentement, droit à l'effacement, contrats de sous-traitance (Supabase, Vercel), politique de confidentialité. Obligatoire avant tout pilote avec de vrais apprenants autres que Mélissa.
 2. ⚠️ **Sécurité** : audit de l'isolation entre organismes, politique de mots de passe, double authentification, sauvegardes, journal d'accès.
-3. ⚠️ **Parcours** : suppression d'un module ou d'un parcours = fichiers PDF laissés orphelins dans le stockage ; un PDF est lisible par tout membre de l'organisme connaissant son chemin (contrôle d'accès au niveau du parcours à ajouter) ; pas de réorganisation des modules/contenus ; pas de modification d'un parcours existant (titre, durée) ; pas de pagination.
+3. ⚠️ **Parcours** : suppression d'un module ou d'un parcours = fichiers PDF laissés orphelins dans le stockage ; un PDF est lisible par tout membre de l'organisme connaissant son chemin (contrôle d'accès au niveau du parcours à ajouter) ; pas de réorganisation des modules/contenus ; pas de modification du titre, de la durée ni des objectifs d'un parcours existant ; pas de pagination.
 3. ⚠️ **Logos** : les anciens logos ne sont pas supprimés (fichiers orphelins) ; pas de redimensionnement ni d'analyse des images envoyées ; thème clair uniquement (pas de mode sombre) ; accessibilité des contrastes à auditer (RGAA).
 3. ⚠️ **Comptes de démo** : mot de passe unique et simple, à supprimer avant toute mise en production ; tables auth alimentées par SQL direct (démo uniquement).
 3. ⚠️ **Dépendances de développement** : `npm audit` signale 5 vulnérabilités « high » dans l'outil de lint (`eslint-config-next` → `braces`). Sans effet en production ; à traiter à la prochaine montée de version.

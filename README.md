@@ -64,5 +64,5 @@ Le logo (PNG, JPEG ou WebP, 1 Mo) peut être remplacé ou retiré (case « Retir
 
 ## 9. Parcours (étape 4)
 Applique dans le SQL Editor de Supabase : `supabase/migrations/0003_courses.sql` puis `supabase/seed_courses.sql` (parcours fictifs en « lorem ipsum »).
-- **Formateur / administrateur** : menu « Mes parcours » → créer un parcours, ajouter des modules, puis des contenus (texte, vidéo YouTube/Vimeo, PDF), publier ou repasser en brouillon, « Aperçu apprenant ».
+- **Formateur / administrateur** : menu « Mes parcours » → créer un parcours, ajouter / renommer des modules, ajouter, modifier ou supprimer des contenus (texte, vidéo YouTube/Vimeo, PDF) affichés comme les voit l'apprenant, publier ou repasser en brouillon, « Aperçu apprenant ».
 - **Apprenant** (`apprenant@horizon.test`) : voit uniquement les parcours **publiés** de son organisme. Le parcours « Introduction au management d'équipe » est un brouillon : il n'apparaît pas pour lui.
