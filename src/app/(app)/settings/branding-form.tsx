@@ -6,9 +6,16 @@ import { Card } from "@/components/page-header";
 import { contrastColor, initials } from "@/lib/branding";
 import { updateBranding, type BrandingState } from "./actions";
 
-type Props = { name: string; color: string; logoUrl: string | null };
+type Props = {
+  name: string;
+  color: string;
+  logoUrl: string | null;
+  activityNumber: string | null;
+  signatoryName: string | null;
+  signatoryTitle: string | null;
+};
 
-export function BrandingForm({ name: initialName, color: initialColor, logoUrl }: Props) {
+export function BrandingForm({ name: initialName, color: initialColor, logoUrl, activityNumber, signatoryName, signatoryTitle }: Props) {
   const [state, action, pending] = useActionState<BrandingState, FormData>(updateBranding, {
     status: "idle",
     message: null,
@@ -63,6 +70,24 @@ export function BrandingForm({ name: initialName, color: initialColor, logoUrl }
               className={`${fieldClass} text-sm`}
             />
           </label>
+
+          <fieldset className="space-y-4 border-t border-zinc-200 pt-5">
+            <legend className="pr-2 text-sm font-semibold text-zinc-900">Mentions de l&apos;attestation de fin de formation</legend>
+            <label className="block text-sm font-medium text-zinc-900">
+              Numéro de déclaration d&apos;activité
+              <input name="activityNumber" defaultValue={activityNumber ?? ""} maxLength={60} className={fieldClass} />
+            </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block text-sm font-medium text-zinc-900">
+                Nom du signataire
+                <input name="signatoryName" defaultValue={signatoryName ?? ""} maxLength={80} className={fieldClass} />
+              </label>
+              <label className="block text-sm font-medium text-zinc-900">
+                Fonction du signataire
+                <input name="signatoryTitle" defaultValue={signatoryTitle ?? ""} maxLength={80} className={fieldClass} />
+              </label>
+            </div>
+          </fieldset>
 
           {logoUrl && (
             <label className="flex items-center gap-2 text-sm text-zinc-900">

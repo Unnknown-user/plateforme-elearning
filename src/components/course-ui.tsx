@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { BookOpen, Clock, FileText, Layers, PlayCircle, Type } from "lucide-react";
 import { formatDuration, parseVideoUrl } from "@/lib/content";
 import type { ContentRow, CourseStatus, CourseSummary } from "@/lib/courses";
+import { STATUS_LABELS, type TrackingStatus } from "@/lib/tracking";
 
 // Teintes d'accompagnement : chaque carte mélange la couleur de l'organisme avec l'une d'elles,
 // pour une interface vivante qui reste aux couleurs du client.
@@ -56,11 +57,13 @@ export function CourseCard({
   href,
   index,
   showStatus,
+  progress,
 }: {
   course: CourseSummary;
   href: string;
   index: number;
   showStatus: boolean;
+  progress?: { percent: number; status: TrackingStatus };
 }) {
   const accent = ACCENTS[index % ACCENTS.length];
   const cover: CSSProperties = {
@@ -78,6 +81,12 @@ export function CourseCard({
       <div className="flex flex-1 flex-col gap-2 p-5">
         <h3 className="font-semibold leading-snug text-zinc-900">{course.title}</h3>
         <p className="line-clamp-2 text-sm text-zinc-600">{course.description}</p>
+        {progress && (
+          <div className="mt-2 space-y-1.5">
+            <TrackingBadge status={progress.status} />
+            <ProgressBar percent={progress.percent} status={progress.status} />
+          </div>
+        )}
         <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1 pt-3 text-xs text-zinc-600">
           <span className="flex items-center gap-1.5">
             <Clock className="h-4 w-4" aria-hidden /> {formatDuration(course.duration_minutes)}
@@ -145,5 +154,40 @@ export function ContentView({ content, pdfUrl }: { content: ContentRow; pdfUrl?:
           <p className="text-sm text-zinc-600">Document indisponible.</p>
         ))}
     </article>
+  );
+}
+
+const STATUS_STYLES = {
+  not_started: "bg-zinc-100 text-zinc-700",
+  in_progress: "bg-sky-100 text-sky-800",
+  completed: "bg-emerald-100 text-emerald-800",
+} as const;
+
+export function TrackingBadge({ status }: { status: TrackingStatus }) {
+  return (
+    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[status]}`}>
+      {STATUS_LABELS[status]}
+    </span>
+  );
+}
+
+export function ProgressBar({ percent, status }: { percent: number; status: TrackingStatus }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Progression"
+        className="h-2 flex-1 overflow-hidden rounded-full bg-zinc-200"
+      >
+        <div
+          style={{ width: `${percent}%` }}
+          className={`h-full rounded-full ${status === "completed" ? "bg-emerald-500" : "bg-[var(--brand)]"}`}
+        />
+      </div>
+      <span className="w-10 text-right text-xs font-medium text-zinc-700">{percent} %</span>
+    </div>
   );
 }

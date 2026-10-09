@@ -65,7 +65,7 @@ async function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      <main className="mx-auto w-full max-w-5xl p-6 md:p-10">{children}</main>
+      <main className="mx-auto w-full min-w-0 max-w-5xl p-6 md:p-10">{children}</main>
     </div>
   );
 }

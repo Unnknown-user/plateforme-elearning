@@ -8,13 +8,29 @@ export type CurrentUser = {
   email: string;
   fullName: string;
   role: Role;
-  organization: { id: string; name: string; logoUrl: string | null; primaryColor: string };
+  organization: {
+    id: string;
+    name: string;
+    logoUrl: string | null;
+    primaryColor: string;
+    activityNumber: string | null;
+    signatoryName: string | null;
+    signatoryTitle: string | null;
+  };
 };
 
 type ProfileRow = {
   full_name: string;
   role: string;
-  organizations: { id: string; name: string; logo_url: string | null; primary_color: string } | null;
+  organizations: {
+    id: string;
+    name: string;
+    logo_url: string | null;
+    primary_color: string;
+    activity_number: string | null;
+    signatory_name: string | null;
+    signatory_title: string | null;
+  } | null;
 };
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
@@ -27,7 +43,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   // Les règles d'isolation de la base garantissent qu'on ne reçoit que SON organisme.
   const { data } = await supabase
     .from("profiles")
-    .select("full_name, role, organizations(id, name, logo_url, primary_color)")
+    .select("full_name, role, organizations(id, name, logo_url, primary_color, activity_number, signatory_name, signatory_title)")
     .eq("id", user.id)
     .single<ProfileRow>();
   if (!data || !data.organizations || !isRole(data.role)) return null;
@@ -42,6 +58,9 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       name: data.organizations.name,
       logoUrl: data.organizations.logo_url,
       primaryColor: data.organizations.primary_color,
+      activityNumber: data.organizations.activity_number,
+      signatoryName: data.organizations.signatory_name,
+      signatoryTitle: data.organizations.signatory_title,
     },
   };
 }

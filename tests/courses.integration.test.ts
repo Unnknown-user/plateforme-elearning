@@ -2,26 +2,16 @@
 // pour les apprenants, écriture réservée aux formateurs/administrateurs.
 // Lancer avec : npm run test:isolation   (nécessite 0003_courses.sql et seed_courses.sql appliqués)
 import { afterAll, describe, expect, it } from "vitest";
+import { signIn } from "./auth-helper";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const DEMO_PASSWORD = "Demo-Elearning-2026!";
 
 const ORG_HORIZON = "a0000000-0000-4000-8000-000000000001";
 const ORG_LUMIERE = "b0000000-0000-4000-8000-000000000002";
 const DRAFT_HORIZON = "c1000000-0000-4000-8000-000000000003";
 
 type Row = Record<string, unknown>;
-
-async function signIn(email: string): Promise<string> {
-  const res = await fetch(`${url}/auth/v1/token?grant_type=password`, {
-    method: "POST",
-    headers: { apikey: anonKey!, "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password: DEMO_PASSWORD }),
-  });
-  if (!res.ok) throw new Error(`Connexion impossible pour ${email}`);
-  return ((await res.json()) as { access_token: string }).access_token;
-}
 
 const headers = (token: string) => ({
   apikey: anonKey!,

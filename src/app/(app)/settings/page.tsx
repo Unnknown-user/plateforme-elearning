@@ -12,7 +12,14 @@ export default async function SettingsPage() {
         title="Paramètres de l'organisme"
         description="Personnalisez l'apparence de la plateforme : vos apprenants et formateurs verront votre nom, votre logo et vos couleurs."
       />
-      <BrandingForm name={organization.name} color={organization.primaryColor} logoUrl={organization.logoUrl} />
+      <BrandingForm
+        name={organization.name}
+        color={organization.primaryColor}
+        logoUrl={organization.logoUrl}
+        activityNumber={organization.activityNumber}
+        signatoryName={organization.signatoryName}
+        signatoryTitle={organization.signatoryTitle}
+      />
     </>
   );
 }

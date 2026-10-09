@@ -2,26 +2,15 @@
 // et vérifie que personne ne voit les données d'un autre organisme.
 // Lancer avec : npm run test:isolation   (nécessite .env.local et le seed appliqué)
 import { describe, expect, it } from "vitest";
+import { signIn } from "./auth-helper";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const DEMO_PASSWORD = "Demo-Elearning-2026!";
 
 const ORG_HORIZON = "a0000000-0000-4000-8000-000000000001";
 const ORG_LUMIERE = "b0000000-0000-4000-8000-000000000002";
 
 type Row = Record<string, unknown>;
-
-async function signIn(email: string): Promise<string> {
-  const res = await fetch(`${url}/auth/v1/token?grant_type=password`, {
-    method: "POST",
-    headers: { apikey: anonKey!, "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password: DEMO_PASSWORD }),
-  });
-  if (!res.ok) throw new Error(`Connexion impossible pour ${email} (${res.status})`);
-  const data = (await res.json()) as { access_token: string };
-  return data.access_token;
-}
 
 async function select(table: string, token: string | null): Promise<Row[]> {
   const res = await fetch(`${url}/rest/v1/${table}?select=*`, {
@@ -37,12 +26,12 @@ describe.skipIf(!url || !anonKey)("isolation entre organismes (base réelle)", (
     expect(await select("profiles", null)).toEqual([]);
   });
 
-  it("l'administrateur d'Horizon voit son organisme et ses 3 membres, pas ceux de Lumière", async () => {
+  it("l'administrateur d'Horizon voit son organisme et ses membres, pas ceux de Lumière", async () => {
     const token = await signIn("admin@horizon.test");
     const orgs = await select("organizations", token);
     const profiles = await select("profiles", token);
     expect(orgs.map((o) => o.id)).toEqual([ORG_HORIZON]);
-    expect(profiles).toHaveLength(3);
+    expect(profiles.length).toBeGreaterThanOrEqual(3);
     expect(profiles.every((p) => p.organization_id === ORG_HORIZON)).toBe(true);
   });
 

@@ -43,7 +43,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 - [x] **Étape 3** — Personnalisation marque blanche (nom, couleur, logo avec retrait, refonte de l'interface : menu latéral, cartes) — 2026-10-09
 - [x] **Étape 4** — Création de parcours : parcours, modules, contenus texte / vidéo (YouTube, Vimeo) / PDF, publication, aperçu apprenant, parcours fictifs lorem (`supabase/seed_courses.sql`) — 2026-10-09
 - [x] **Étape 5** — Quiz : choix unique / multiple / vrai-faux, seuil et tentatives paramétrables, correction affichable ou non, score calculé dans la base, bonnes réponses invisibles aux apprenants, 3 quiz fictifs (`supabase/seed_quizzes.sql`). Ajouts : modification du titre/durée/objectifs d'un parcours, réordonnancement des modules et contenus — 2026-10-09
-- [ ] Étape 6 — Suivi, traces Qualiopi, export CSV, attestation PDF
+- [x] **Étape 6** — Suivi et traces Qualiopi : contenus terminés, temps passé (plafonné côté base), avancement et statut par parcours, tableau de suivi, export CSV (suivi + résultats aux quiz), attestation de fin de parcours en PDF, mentions légales de l'organisme, apprenants et activité fictifs (`supabase/seed_tracking.sql`) — 2026-10-09
 - [ ] Étape 7 — Données de démo, page d'accueil publique légère, scénario de démo prospect
 
 ## Journal des décisions
@@ -67,6 +67,12 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Quiz : bonnes réponses dans une table séparée (`choice_keys`) lisible par le seul personnel ; score calculé par la fonction SQL `submit_quiz_attempt` ; aucune écriture directe des tentatives | Un apprenant ne peut ni lire les réponses ni s'inventer une note |
 | 2026-10-09 | Notation : 1 point par question, tout-ou-rien (choix multiple : il faut cocher exactement les bonnes réponses) ; réussite si score >= seuil | Règle simple et lisible, À VALIDER avec Mélissa |
 | 2026-10-09 | Tests des quiz : parcours temporaire créé puis supprimé (cascade) | Ne consomme pas les tentatives des comptes de démo |
+| 2026-10-09 | Avancement = (contenus terminés + quiz réussis) / (contenus + quiz) ; « terminé » à 100 % ; contenu terminé = déclaré par l'apprenant (bouton) | Règle simple et lisible, À VALIDER avec Mélissa |
+| 2026-10-09 | Temps passé mesuré par signaux de présence (30 s) ; la base plafonne chaque signal au temps réellement écoulé | Empêche de gonfler le temps ; reste une approximation (présence à l'écran) |
+| 2026-10-09 | Écriture des traces uniquement via les fonctions SQL `mark_content_done` et `track_course_time` | L'apprenant ne peut pas falsifier ses traces |
+| 2026-10-09 | Exports CSV : séparateur « ; », UTF-8 avec BOM, cellules neutralisées contre l'injection de formules | Ouverture directe dans Excel français, sans faille d'injection |
+| 2026-10-09 | Attestation PDF générée avec pdf-lib, mentions : organisme + n° de déclaration d'activité, apprenant, parcours, durée prévue / connexion, période, objectifs, évaluations, signataire | Base validée par Mélissa, à peaufiner |
+| 2026-10-09 | Tests réels : jetons de connexion mis en cache (`tests/auth-helper.ts`) | Supabase limite les connexions rapprochées (erreur 429) |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
@@ -79,6 +85,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE.
 1. ⚠️ **RGPD** : registre de traitements, information et consentement, droit à l'effacement, contrats de sous-traitance (Supabase, Vercel), politique de confidentialité. Obligatoire avant tout pilote avec de vrais apprenants autres que Mélissa.
 2. ⚠️ **Sécurité** : audit de l'isolation entre organismes, politique de mots de passe, double authentification, sauvegardes, journal d'accès.
+3. ⚠️ **Suivi et attestation** : mentions de l'attestation et colonnes des exports À VALIDER avec Mélissa (et un auditeur Qualiopi) ; le temps passé mesure la présence active à l'écran (approximation, pas une preuve d'assiduité) ; « contenu terminé » est déclaratif ; pas de modèle d'attestation personnalisable, pas de numérotation ni de registre des attestations émises, pas de signature électronique ; pas d'émargement ni d'évaluations à chaud / à froid ; durée de conservation des traces et droit à l'effacement (RGPD) à définir ; webp non géré pour le logo du PDF.
 3. ⚠️ **Quiz** : règle de notation à valider avec Mélissa (points partiels ? pondération ? questions obligatoires ?) ; questions non modifiables après création (supprimer puis recréer) et non réordonnables ; pas de banque de questions, de tirage aléatoire ni de limite de temps ; tentatives non supprimables (RGPD : droit à l'effacement à prévoir) ; audit de la fonction `submit_quiz_attempt`.
 3. ⚠️ **Parcours** : suppression d'un module ou d'un parcours = fichiers PDF laissés orphelins dans le stockage ; un PDF est lisible par tout membre de l'organisme connaissant son chemin (contrôle d'accès au niveau du parcours à ajouter) ; pas de réorganisation des modules/contenus ; pas de modification du titre, de la durée ni des objectifs d'un parcours existant ; pas de pagination.
 3. ⚠️ **Logos** : les anciens logos ne sont pas supprimés (fichiers orphelins) ; pas de redimensionnement ni d'analyse des images envoyées ; thème clair uniquement (pas de mode sombre) ; accessibilité des contrastes à auditer (RGAA).

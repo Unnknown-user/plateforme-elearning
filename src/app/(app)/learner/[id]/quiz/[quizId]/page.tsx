@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Circle } from "lucide-react";
 import { Card } from "@/components/page-header";
 import { QuizRunner } from "@/components/quiz-runner";
+import { TimeTracker } from "@/components/time-tracker";
 import { can } from "@/lib/permissions";
 import { getMyAttempts, getQuiz } from "@/lib/quizzes";
 import { requireUser } from "@/lib/session";
@@ -53,6 +54,7 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
 
   return (
     <>
+      <TimeTracker courseId={courseId} />
       {back}
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-zinc-900">{quiz.title}</h1>
       <p className="mb-6 text-sm text-zinc-600">

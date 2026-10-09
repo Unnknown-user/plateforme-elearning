@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/session";
-import { LOGO_EXTENSIONS, validateBranding, validateLogo } from "@/lib/branding";
+import { LOGO_EXTENSIONS, validateBranding, validateLegal, validateLogo } from "@/lib/branding";
 
 export type BrandingState = { status: "idle" | "success" | "error"; message: string | null };
 
@@ -16,6 +16,13 @@ export async function updateBranding(_prev: BrandingState, formData: FormData): 
     color: String(formData.get("color") ?? ""),
   });
   if (!parsed.ok) return { status: "error", message: parsed.error };
+
+  const legal = validateLegal({
+    activityNumber: String(formData.get("activityNumber") ?? ""),
+    signatoryName: String(formData.get("signatoryName") ?? ""),
+    signatoryTitle: String(formData.get("signatoryTitle") ?? ""),
+  });
+  if (!legal.ok) return { status: "error", message: legal.error };
 
   const supabase = await createClient();
   let logoUrl: string | undefined;
@@ -39,6 +46,9 @@ export async function updateBranding(_prev: BrandingState, formData: FormData): 
     .update({
       name: parsed.value.name,
       primary_color: parsed.value.color,
+      activity_number: legal.value.activityNumber,
+      signatory_name: legal.value.signatoryName,
+      signatory_title: legal.value.signatoryTitle,
       ...(logoUrl ? { logo_url: logoUrl } : removeLogo ? { logo_url: null } : {}),
     })
     .eq("id", user.organization.id)

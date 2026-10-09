@@ -73,3 +73,11 @@ Applique dans le SQL Editor de Supabase : `supabase/migrations/0004_quizzes.sql`
 - **Apprenant** : la carte du quiz apparaît à la fin du module ; il répond, voit son score, « réussi / non réussi », et la correction si elle est activée.
 - **Règle de notation** : 1 point par question ; une question est juste seulement si les bonnes réponses sont **exactement** cochées. Score = bonnes questions ÷ total ; réussite si score ≥ seuil.
 - `npm run test:isolation` vérifie aussi, sur ta vraie base, le calcul des scores, le seuil, la limite de tentatives et l'invisibilité des bonnes réponses.
+
+## 11. Suivi, exports et attestation (étape 6)
+Applique dans le SQL Editor de Supabase : `supabase/migrations/0005_tracking.sql` puis `supabase/seed_tracking.sql` (3 apprenants fictifs en plus : `thomas@horizon.test`, `camille@horizon.test`, `julien@lumiere.test`, avec de l'activité variée).
+- **Apprenant** : sur un parcours, bouton « Marquer comme terminé » sous chaque contenu ; barre de progression ; temps passé ; une fois 100 % atteint (contenus terminés et quiz réussis), bouton « Télécharger mon attestation ».
+- **Formateur / administrateur** : menu « Apprenants et suivi » : tableau (statut, progression, temps, quiz, dernière activité), boutons « Export du suivi (CSV) » et « Résultats aux quiz (CSV) », et un lien PDF d'attestation pour chaque parcours terminé.
+- **Administrateur** : « Paramètres de l'organisme » → mentions de l'attestation (numéro de déclaration d'activité, nom et fonction du signataire).
+- Les fichiers CSV s'ouvrent directement dans Excel (accents corrects). Les numéros d'activité de démonstration sont fictifs.
+- ⚠️ Le temps passé mesure la présence active à l'écran : c'est une indication, pas une preuve d'assiduité.

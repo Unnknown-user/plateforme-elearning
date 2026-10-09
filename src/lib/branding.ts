@@ -1,6 +1,8 @@
 // Règles de la marque blanche : validation du nom, de la couleur et du logo d'un organisme.
 // Logique pure (sans base de données) pour pouvoir la tester facilement.
 
+import type { Validation } from "@/lib/content";
+
 export const DEFAULT_PRIMARY_COLOR = "#1d4ed8";
 export const NAME_MAX_LENGTH = 80;
 export const LOGO_MAX_BYTES = 1_048_576; // 1 Mo
@@ -59,4 +61,26 @@ export function initials(name: string): string {
     .filter(Boolean)
     .map((word) => word[0]!.toUpperCase());
   return (letters.length > 1 ? letters[0]! + letters[1]! : (letters[0] ?? "?")).slice(0, 2);
+}
+
+export type LegalInfo = { activityNumber: string | null; signatoryName: string | null; signatoryTitle: string | null };
+
+/** Mentions légales de l'attestation : champs facultatifs, vides = absents. */
+export function validateLegal(raw: { activityNumber: string; signatoryName: string; signatoryTitle: string }): Validation<LegalInfo> {
+  const clean = (value: string) => value.trim().replace(/\s+/g, " ");
+  const activityNumber = clean(raw.activityNumber);
+  const signatoryName = clean(raw.signatoryName);
+  const signatoryTitle = clean(raw.signatoryTitle);
+  if (activityNumber.length > 60) return { ok: false, error: "Le numéro de déclaration d'activité est trop long (60 caractères maximum)." };
+  if (signatoryName.length > 80 || signatoryTitle.length > 80) {
+    return { ok: false, error: "Le nom et la fonction du signataire sont limités à 80 caractères." };
+  }
+  return {
+    ok: true,
+    value: {
+      activityNumber: activityNumber || null,
+      signatoryName: signatoryName || null,
+      signatoryTitle: signatoryTitle || null,
+    },
+  };
 }

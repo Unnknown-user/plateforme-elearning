@@ -52,3 +52,19 @@ describe("initiales", () => {
     expect(initials("   ")).toBe("?");
   });
 });
+
+describe("mentions légales de l'attestation", () => {
+  it("nettoie les espaces et transforme les champs vides en absence de valeur", async () => {
+    const { validateLegal } = await import("./branding");
+    expect(validateLegal({ activityNumber: "  11 75   00000 75 ", signatoryName: "", signatoryTitle: " Directrice " })).toEqual({
+      ok: true,
+      value: { activityNumber: "11 75 00000 75", signatoryName: null, signatoryTitle: "Directrice" },
+    });
+  });
+
+  it("refuse les valeurs trop longues", async () => {
+    const { validateLegal } = await import("./branding");
+    expect(validateLegal({ activityNumber: "1".repeat(61), signatoryName: "", signatoryTitle: "" }).ok).toBe(false);
+    expect(validateLegal({ activityNumber: "", signatoryName: "a".repeat(81), signatoryTitle: "" }).ok).toBe(false);
+  });
+});
