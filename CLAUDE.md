@@ -39,7 +39,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 
 ## État d'avancement
 - [x] **Étape 1** — Initialisation (projet, Git, tests, CLAUDE.md, README.md) — 2026-10-09
-- [ ] Étape 2 — Comptes et rôles + isolation + tests
+- [ ] Étape 2 — Comptes et rôles + isolation + tests. FAIT : droits par rôle (permissions.ts), schéma + règles RLS (supabase/migrations), comptes de démo (supabase/seed.sql), test d'isolation sur base réelle (npm run test:isolation). RESTE : écrans de connexion et menu par rôle.
 - [ ] Étape 3 — Personnalisation marque blanche
 - [ ] Étape 4 — Création de parcours
 - [ ] Étape 5 — Quiz
@@ -54,6 +54,8 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Budget 0 € : offres gratuites, pas de nom de domaine pour l'instant | Choix de Mélissa |
 | 2026-10-09 | Page d'accueil publique légère (option A) en étape 7 | Montrer l'expertise de Mélissa sans mettre le délai en danger |
 | 2026-10-09 | Projet dans `plateforme-elearning/` avec son propre dépôt Git | Le dossier personnel est lui-même un dépôt Git ; éviter tout mélange |
+| 2026-10-09 | Test d'isolation contre la vraie base Supabase (hors `npm test`) | Seul moyen de prouver que les règles RLS fonctionnent ; données fictives |
+| 2026-10-09 | Noms accentués du seed écrits en séquences U&'\00e9' | Un copier-coller via le presse-papiers avait corrompu les accents |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
@@ -66,6 +68,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE.
 1. ⚠️ **RGPD** : registre de traitements, information et consentement, droit à l'effacement, contrats de sous-traitance (Supabase, Vercel), politique de confidentialité. Obligatoire avant tout pilote avec de vrais apprenants autres que Mélissa.
 2. ⚠️ **Sécurité** : audit de l'isolation entre organismes, politique de mots de passe, double authentification, sauvegardes, journal d'accès.
+3. ⚠️ **Comptes de démo** : mot de passe unique et simple, à supprimer avant toute mise en production ; tables auth alimentées par SQL direct (démo uniquement).
 3. ⚠️ **Dépendances de développement** : `npm audit` signale 5 vulnérabilités « high » dans l'outil de lint (`eslint-config-next` → `braces`). Sans effet en production ; à traiter à la prochaine montée de version.
 4. ⚠️ **Hébergement de production** : environnements séparés, supervision, plan de reprise, domaine.
 5. ⚠️ **Conformité Qualiopi** : valider attestation et indicateurs avec Mélissa, voire un auditeur.

@@ -37,3 +37,22 @@ Ils seront créés à l'étape 2 (comptes et rôles), puis listés ici.
 
 ## Documentation du projet
 Voir `CLAUDE.md` : périmètre, stack, décisions, avancement et feuille de route vers la commercialisation.
+
+## 6. Comptes de démonstration (données fictives)
+Il faut avoir appliqué `supabase/migrations/0001_organizations_and_profiles.sql` puis `supabase/seed.sql` dans Supabase (SQL Editor).
+Mot de passe de tous les comptes : `Demo-Elearning-2026!`
+
+| Organisme | Rôle | Identifiant |
+|---|---|---|
+| Institut Horizon Formation | Administrateur | admin@horizon.test |
+| Institut Horizon Formation | Formateur | formateur@horizon.test |
+| Institut Horizon Formation | Apprenant | apprenant@horizon.test |
+| Atelier Lumière Conseil | Administrateur | admin@lumiere.test |
+| Atelier Lumière Conseil | Formateur | formateur@lumiere.test |
+| Atelier Lumière Conseil | Apprenant | apprenant@lumiere.test |
+
+## 7. Test d'isolation entre organismes
+```bash
+npm run test:isolation
+```
+Ce test se connecte à ta vraie base Supabase avec chaque compte et vérifie que personne ne voit les données d'un autre organisme. Il faut `.env.local` rempli. Tu dois voir « 5 passed ».
