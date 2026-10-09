@@ -1,11 +1,18 @@
+import { PageHeader } from "@/components/page-header";
 import { requireUser } from "@/lib/session";
+import { BrandingForm } from "./branding-form";
 
-export default async function Page() {
-  await requireUser("organization:manage");
+export default async function SettingsPage() {
+  const user = await requireUser("organization:manage");
+  const { organization } = user;
+
   return (
-    <section>
-      <h1 className="text-2xl font-semibold">Paramètres de l&apos;organisme</h1>
-      <p className="mt-2 text-zinc-600">Bientôt : nom, logo et couleurs de l&apos;organisme (étape 3).</p>
-    </section>
+    <>
+      <PageHeader
+        title="Paramètres de l'organisme"
+        description="Personnalisez l'apparence de la plateforme : vos apprenants et formateurs verront votre nom, votre logo et vos couleurs."
+      />
+      <BrandingForm name={organization.name} color={organization.primaryColor} logoUrl={organization.logoUrl} />
+    </>
   );
 }

@@ -57,3 +57,7 @@ Mot de passe de tous les comptes : `Demo-Elearning-2026!`
 npm run test:isolation
 ```
 Ce test se connecte à ta vraie base Supabase avec chaque compte et vérifie que personne ne voit les données d'un autre organisme. Il faut `.env.local` rempli. Tu dois voir « 5 passed ».
+
+## 8. Personnaliser un organisme (marque blanche)
+Connecte-toi en **administrateur** (`admin@horizon.test`), ouvre « Paramètres de l'organisme » : change le nom, la couleur et le logo, puis « Enregistrer ». Toute l'interface de cet organisme change ; l'autre organisme reste inchangé.
+Pour que l'envoi de logo fonctionne, applique d'abord `supabase/migrations/0002_logos_storage.sql` dans le SQL Editor de Supabase.

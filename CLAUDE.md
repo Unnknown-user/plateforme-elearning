@@ -40,7 +40,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 ## État d'avancement
 - [x] **Étape 1** — Initialisation (projet, Git, tests, CLAUDE.md, README.md) — 2026-10-09
 - [x] **Étape 2** — Comptes et rôles + isolation + tests : droits par rôle (`permissions.ts`), schéma + RLS (`supabase/migrations`), comptes de démo (`supabase/seed.sql`), test d'isolation sur base réelle (`npm run test:isolation`), page de connexion, protection des pages (`src/proxy.ts`), menu par rôle — 2026-10-09
-- [ ] Étape 3 — Personnalisation marque blanche
+- [~] Étape 3 — Personnalisation marque blanche (nom, couleur, logo, refonte de l'interface : menu latéral, cartes). Code terminé le 2026-10-09 ; reste à appliquer `supabase/migrations/0002_logos_storage.sql` et valider l'envoi de logo
 - [ ] Étape 4 — Création de parcours
 - [ ] Étape 5 — Quiz
 - [ ] Étape 6 — Suivi, traces Qualiopi, export CSV, attestation PDF
@@ -58,6 +58,8 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Noms accentués du seed écrits en séquences U&'\00e9' | Un copier-coller via le presse-papiers avait corrompu les accents |
 | 2026-10-09 | Options `cacheComponents` / `partialPrefetching` de Next.js retirées | Activées par défaut dans le modèle de projet, elles imposent des contraintes inutiles : tout l'espace connecté est propre à chaque personne (rendu à la demande) |
 | 2026-10-09 | Next.js 16 : `src/proxy.ts` remplace `middleware.ts` | Convention officielle de cette version |
+| 2026-10-09 | Refonte de l'interface dans l'esprit des LMS modernes (menu latéral, cartes, accent = couleur de l'organisme via variables CSS `--brand`) ; icônes lucide-react | Demande de Mélissa ; inspiration d'ergonomie uniquement, sans reprise de marque ni d'éléments protégés |
+| 2026-10-09 | Logo : PNG/JPEG/WebP, 1 Mo max, SVG refusé ; dossier = identifiant de l'organisme ; lecture publique | Un SVG peut contenir du code actif ; la base empêche d'écrire dans le dossier d'un autre organisme |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
@@ -70,6 +72,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE.
 1. ⚠️ **RGPD** : registre de traitements, information et consentement, droit à l'effacement, contrats de sous-traitance (Supabase, Vercel), politique de confidentialité. Obligatoire avant tout pilote avec de vrais apprenants autres que Mélissa.
 2. ⚠️ **Sécurité** : audit de l'isolation entre organismes, politique de mots de passe, double authentification, sauvegardes, journal d'accès.
+3. ⚠️ **Logos** : les anciens logos ne sont pas supprimés (fichiers orphelins) ; pas de redimensionnement ni d'analyse des images envoyées ; thème clair uniquement (pas de mode sombre) ; accessibilité des contrastes à auditer (RGAA).
 3. ⚠️ **Comptes de démo** : mot de passe unique et simple, à supprimer avant toute mise en production ; tables auth alimentées par SQL direct (démo uniquement).
 3. ⚠️ **Dépendances de développement** : `npm audit` signale 5 vulnérabilités « high » dans l'outil de lint (`eslint-config-next` → `braces`). Sans effet en production ; à traiter à la prochaine montée de version.
 4. ⚠️ **Hébergement de production** : environnements séparés, supervision, plan de reprise, domaine.
