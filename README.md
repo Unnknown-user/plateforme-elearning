@@ -61,3 +61,8 @@ Ce test se connecte à ta vraie base Supabase avec chaque compte et vérifie que
 ## 8. Personnaliser un organisme (marque blanche)
 Connecte-toi en **administrateur** (`admin@horizon.test`), ouvre « Paramètres de l'organisme » : change le nom, la couleur et le logo, puis « Enregistrer ». Toute l'interface de cet organisme change ; l'autre organisme reste inchangé.
 Le logo (PNG, JPEG ou WebP, 1 Mo) peut être remplacé ou retiré (case « Retirer le logo actuel »). Prérequis : avoir appliqué `supabase/migrations/0002_logos_storage.sql` dans le SQL Editor de Supabase.
+
+## 9. Parcours (étape 4)
+Applique dans le SQL Editor de Supabase : `supabase/migrations/0003_courses.sql` puis `supabase/seed_courses.sql` (parcours fictifs en « lorem ipsum »).
+- **Formateur / administrateur** : menu « Mes parcours » → créer un parcours, ajouter des modules, puis des contenus (texte, vidéo YouTube/Vimeo, PDF), publier ou repasser en brouillon, « Aperçu apprenant ».
+- **Apprenant** (`apprenant@horizon.test`) : voit uniquement les parcours **publiés** de son organisme. Le parcours « Introduction au management d'équipe » est un brouillon : il n'apparaît pas pour lui.
