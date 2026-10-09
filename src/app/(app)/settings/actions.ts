@@ -31,13 +31,15 @@ export async function updateBranding(_prev: BrandingState, formData: FormData): 
     if (error) return { status: "error", message: "Le logo n'a pas pu être envoyé. Réessayez." };
     logoUrl = supabase.storage.from("logos").getPublicUrl(path).data.publicUrl;
   }
+  // Un nouveau logo l'emporte ; sinon la case « Retirer le logo » remet l'avatar à initiales.
+  const removeLogo = !logoUrl && formData.get("removeLogo") === "on";
 
   const { data, error } = await supabase
     .from("organizations")
     .update({
       name: parsed.value.name,
       primary_color: parsed.value.color,
-      ...(logoUrl ? { logo_url: logoUrl } : {}),
+      ...(logoUrl ? { logo_url: logoUrl } : removeLogo ? { logo_url: null } : {}),
     })
     .eq("id", user.organization.id)
     .select("id");

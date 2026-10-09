@@ -60,4 +60,4 @@ Ce test se connecte à ta vraie base Supabase avec chaque compte et vérifie que
 
 ## 8. Personnaliser un organisme (marque blanche)
 Connecte-toi en **administrateur** (`admin@horizon.test`), ouvre « Paramètres de l'organisme » : change le nom, la couleur et le logo, puis « Enregistrer ». Toute l'interface de cet organisme change ; l'autre organisme reste inchangé.
-Pour que l'envoi de logo fonctionne, applique d'abord `supabase/migrations/0002_logos_storage.sql` dans le SQL Editor de Supabase.
+Le logo (PNG, JPEG ou WebP, 1 Mo) peut être remplacé ou retiré (case « Retirer le logo actuel »). Prérequis : avoir appliqué `supabase/migrations/0002_logos_storage.sql` dans le SQL Editor de Supabase.

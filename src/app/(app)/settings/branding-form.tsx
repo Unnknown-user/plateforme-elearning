@@ -64,6 +64,18 @@ export function BrandingForm({ name: initialName, color: initialColor, logoUrl }
             />
           </label>
 
+          {logoUrl && (
+            <label className="flex items-center gap-2 text-sm text-zinc-900">
+              <input
+                name="removeLogo"
+                type="checkbox"
+                onChange={(e) => setPreview(e.target.checked ? null : logoUrl)}
+                className="h-4 w-4"
+              />
+              Retirer le logo actuel
+            </label>
+          )}
+
           {state.message && (
             <p
               role={state.status === "error" ? "alert" : "status"}

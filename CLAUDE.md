@@ -40,7 +40,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 ## État d'avancement
 - [x] **Étape 1** — Initialisation (projet, Git, tests, CLAUDE.md, README.md) — 2026-10-09
 - [x] **Étape 2** — Comptes et rôles + isolation + tests : droits par rôle (`permissions.ts`), schéma + RLS (`supabase/migrations`), comptes de démo (`supabase/seed.sql`), test d'isolation sur base réelle (`npm run test:isolation`), page de connexion, protection des pages (`src/proxy.ts`), menu par rôle — 2026-10-09
-- [~] Étape 3 — Personnalisation marque blanche (nom, couleur, logo, refonte de l'interface : menu latéral, cartes). Code terminé le 2026-10-09 ; reste à appliquer `supabase/migrations/0002_logos_storage.sql` et valider l'envoi de logo
+- [x] **Étape 3** — Personnalisation marque blanche (nom, couleur, logo avec retrait, refonte de l'interface : menu latéral, cartes) — 2026-10-09
 - [ ] Étape 4 — Création de parcours
 - [ ] Étape 5 — Quiz
 - [ ] Étape 6 — Suivi, traces Qualiopi, export CSV, attestation PDF
