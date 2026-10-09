@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock, Eye, EyeOff, Globe, Target, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Clock, Eye, EyeOff, Globe, Target, Trash2 } from "lucide-react";
 import { ContentView, StatusBadge } from "@/components/course-ui";
 import { Card } from "@/components/page-header";
 import { formatDuration } from "@/lib/content";
+import { QuizEditor } from "@/components/quiz-editor";
 import { getCourse, signedPdfUrls } from "@/lib/courses";
+import { getQuizzesByModule } from "@/lib/quizzes";
 import { requireUser } from "@/lib/session";
-import { deleteContent, deleteCourse, deleteModule, setCourseStatus } from "../actions";
-import { AddContentForm, AddModuleForm, EditContentForm, RenameModuleForm } from "./course-forms";
+import { deleteContent, deleteCourse, deleteModule, moveContent, moveModule, setCourseStatus } from "../actions";
+import { AddContentForm, AddModuleForm, EditContentForm, EditCourseForm, RenameModuleForm } from "./course-forms";
 
 export default async function CourseManagePage({ params }: { params: Promise<{ id: string }> }) {
   await requireUser("course:manage");
@@ -16,6 +18,7 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
   if (!course) notFound();
 
   const pdfUrls = await signedPdfUrls(course);
+  const quizzes = await getQuizzesByModule(course.modules.map((m) => m.id));
   const published = course.status === "published";
   const objectives = course.objectives.split("\n").filter((line) => line.trim());
 
@@ -59,6 +62,8 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
         </div>
       </div>
 
+      <EditCourseForm course={course} />
+
       {(course.description || objectives.length > 0) && (
         <Card className="mb-6 grid gap-6 md:grid-cols-2">
           {course.description && <p className="leading-relaxed text-zinc-700">{course.description}</p>}
@@ -93,6 +98,13 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
                 {module.title}
               </h3>
               <div className="flex items-center gap-1">
+                <MoveButtons
+                  action={moveModule}
+                  fields={{ courseId: course.id, moduleId: module.id }}
+                  index={index}
+                  count={course.modules.length}
+                  label="le module"
+                />
                 <RenameModuleForm courseId={course.id} moduleId={module.id} title={module.title} />
                 <form action={deleteModule}>
                   <input type="hidden" name="moduleId" value={module.id} />
@@ -116,6 +128,13 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
                     <div className="min-w-0 flex-1">
                       <EditContentForm courseId={course.id} content={content} />
                     </div>
+                    <MoveButtons
+                      action={moveContent}
+                      fields={{ moduleId: module.id, contentId: content.id }}
+                      index={module.contents.indexOf(content)}
+                      count={module.contents.length}
+                      label="le contenu"
+                    />
                     <form action={deleteContent}>
                       <input type="hidden" name="contentId" value={content.id} />
                       <input type="hidden" name="courseId" value={course.id} />
@@ -132,6 +151,7 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
                 </p>
               )}
               <AddContentForm courseId={course.id} moduleId={module.id} />
+              <QuizEditor moduleId={module.id} quiz={quizzes[module.id]} />
             </div>
           </section>
         ))}
@@ -141,5 +161,45 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
         </Card>
       </div>
     </>
+  );
+}
+
+/** Deux flèches (monter / descendre) ; chacune envoie un petit formulaire à l'action serveur. */
+function MoveButtons({
+  action,
+  fields,
+  index,
+  count,
+  label,
+}: {
+  action: (formData: FormData) => Promise<void>;
+  fields: Record<string, string>;
+  index: number;
+  count: number;
+  label: string;
+}) {
+  return (
+    <div className="flex">
+      {(["up", "down"] as const).map((direction) => {
+        const disabled = direction === "up" ? index === 0 : index === count - 1;
+        const text = `${direction === "up" ? "Monter" : "Descendre"} ${label}`;
+        return (
+          <form key={direction} action={action}>
+            {Object.entries(fields).map(([name, value]) => (
+              <input key={name} type="hidden" name={name} value={value} />
+            ))}
+            <input type="hidden" name="direction" value={direction} />
+            <button
+              disabled={disabled}
+              title={text}
+              aria-label={text}
+              className="rounded-lg p-2 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              {direction === "up" ? <ArrowUp className="h-4 w-4" aria-hidden /> : <ArrowDown className="h-4 w-4" aria-hidden />}
+            </button>
+          </form>
+        );
+      })}
+    </div>
   );
 }

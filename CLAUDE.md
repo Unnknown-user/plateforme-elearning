@@ -42,7 +42,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 - [x] **Étape 2** — Comptes et rôles + isolation + tests : droits par rôle (`permissions.ts`), schéma + RLS (`supabase/migrations`), comptes de démo (`supabase/seed.sql`), test d'isolation sur base réelle (`npm run test:isolation`), page de connexion, protection des pages (`src/proxy.ts`), menu par rôle — 2026-10-09
 - [x] **Étape 3** — Personnalisation marque blanche (nom, couleur, logo avec retrait, refonte de l'interface : menu latéral, cartes) — 2026-10-09
 - [x] **Étape 4** — Création de parcours : parcours, modules, contenus texte / vidéo (YouTube, Vimeo) / PDF, publication, aperçu apprenant, parcours fictifs lorem (`supabase/seed_courses.sql`) — 2026-10-09
-- [ ] Étape 5 — Quiz
+- [x] **Étape 5** — Quiz : choix unique / multiple / vrai-faux, seuil et tentatives paramétrables, correction affichable ou non, score calculé dans la base, bonnes réponses invisibles aux apprenants, 3 quiz fictifs (`supabase/seed_quizzes.sql`). Ajouts : modification du titre/durée/objectifs d'un parcours, réordonnancement des modules et contenus — 2026-10-09
 - [ ] Étape 6 — Suivi, traces Qualiopi, export CSV, attestation PDF
 - [ ] Étape 7 — Données de démo, page d'accueil publique légère, scénario de démo prospect
 
@@ -64,6 +64,9 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Vidéos : YouTube et Vimeo seulement, intégrées via youtube-nocookie ; PDF 10 Mo en bucket privé, liens temporaires 1 h | Limite le risque (pas de lien arbitraire intégré) et respecte la vie privée |
 | 2026-10-09 | Copie du SQL dans le presse-papiers avec `LC_ALL=en_US.UTF-8 pbcopy` | Sinon les accents sont corrompus (problème rencontré à l'étape 2) |
 | 2026-10-09 | Écran de gestion d'un parcours : chaque contenu est affiché comme chez l'apprenant (même composant), avec « Modifier » et « Supprimer » dessous ; modules renommables | Demande de Mélissa : voir ce que voit l'apprenant en éditant |
+| 2026-10-09 | Quiz : bonnes réponses dans une table séparée (`choice_keys`) lisible par le seul personnel ; score calculé par la fonction SQL `submit_quiz_attempt` ; aucune écriture directe des tentatives | Un apprenant ne peut ni lire les réponses ni s'inventer une note |
+| 2026-10-09 | Notation : 1 point par question, tout-ou-rien (choix multiple : il faut cocher exactement les bonnes réponses) ; réussite si score >= seuil | Règle simple et lisible, À VALIDER avec Mélissa |
+| 2026-10-09 | Tests des quiz : parcours temporaire créé puis supprimé (cascade) | Ne consomme pas les tentatives des comptes de démo |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
@@ -76,6 +79,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE.
 1. ⚠️ **RGPD** : registre de traitements, information et consentement, droit à l'effacement, contrats de sous-traitance (Supabase, Vercel), politique de confidentialité. Obligatoire avant tout pilote avec de vrais apprenants autres que Mélissa.
 2. ⚠️ **Sécurité** : audit de l'isolation entre organismes, politique de mots de passe, double authentification, sauvegardes, journal d'accès.
+3. ⚠️ **Quiz** : règle de notation à valider avec Mélissa (points partiels ? pondération ? questions obligatoires ?) ; questions non modifiables après création (supprimer puis recréer) et non réordonnables ; pas de banque de questions, de tirage aléatoire ni de limite de temps ; tentatives non supprimables (RGPD : droit à l'effacement à prévoir) ; audit de la fonction `submit_quiz_attempt`.
 3. ⚠️ **Parcours** : suppression d'un module ou d'un parcours = fichiers PDF laissés orphelins dans le stockage ; un PDF est lisible par tout membre de l'organisme connaissant son chemin (contrôle d'accès au niveau du parcours à ajouter) ; pas de réorganisation des modules/contenus ; pas de modification du titre, de la durée ni des objectifs d'un parcours existant ; pas de pagination.
 3. ⚠️ **Logos** : les anciens logos ne sont pas supprimés (fichiers orphelins) ; pas de redimensionnement ni d'analyse des images envoyées ; thème clair uniquement (pas de mode sombre) ; accessibilité des contrastes à auditer (RGAA).
 3. ⚠️ **Comptes de démo** : mot de passe unique et simple, à supprimer avant toute mise en production ; tables auth alimentées par SQL direct (démo uniquement).

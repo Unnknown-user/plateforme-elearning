@@ -2,10 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock, Target } from "lucide-react";
 import { ContentView } from "@/components/course-ui";
+import { QuizCard } from "@/components/quiz-card";
 import { Card } from "@/components/page-header";
 import { formatDuration } from "@/lib/content";
 import { getCourse, signedPdfUrls } from "@/lib/courses";
 import { getMenu } from "@/lib/permissions";
+import { getMyAttempts, getQuizzesByModule } from "@/lib/quizzes";
 import { requireUser } from "@/lib/session";
 
 // Lecture d'un parcours. Accessible aux apprenants (parcours publiés) et, en aperçu, aux formateurs.
@@ -16,6 +18,8 @@ export default async function LearnerCoursePage({ params }: { params: Promise<{ 
   if (!course) notFound();
 
   const pdfUrls = await signedPdfUrls(course);
+  const quizzes = await getQuizzesByModule(course.modules.map((m) => m.id));
+  const attempts = await getMyAttempts(user.id, Object.values(quizzes).map((q) => q.id));
   const objectives = course.objectives.split("\n").filter((line) => line.trim());
   const backHref = getMenu(user.role)[0]?.href ?? "/dashboard";
 
@@ -67,6 +71,13 @@ export default async function LearnerCoursePage({ params }: { params: Promise<{ 
               {module.contents.map((content) => (
                 <ContentView key={content.id} content={content} pdfUrl={content.file_path ? pdfUrls[content.file_path] : undefined} />
               ))}
+              {quizzes[module.id] && (
+                <QuizCard
+                  href={`/learner/${course.id}/quiz/${quizzes[module.id]!.id}`}
+                  quiz={quizzes[module.id]!}
+                  attempts={attempts.filter((a) => a.quiz_id === quizzes[module.id]!.id)}
+                />
+              )}
             </div>
           </section>
         ))}

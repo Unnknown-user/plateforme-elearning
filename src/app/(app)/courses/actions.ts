@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/session";
 import { validateContent, validateCourse, validatePdf, validateTitle } from "@/lib/content";
+import { isDirection, moveItem } from "@/lib/ordering";
 
 export type FormState = { error: string | null; saved?: boolean };
 
@@ -199,4 +200,67 @@ export async function updateContent(_prev: FormState, formData: FormData): Promi
   if (error || !data?.length) return { error: "Les modifications n'ont pas pu être enregistrées." };
   revalidatePath(`/courses/${text(formData, "courseId")}`);
   return { error: null, saved: true };
+}
+
+export async function updateCourse(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireUser("course:manage");
+  const courseId = text(formData, "courseId");
+  const parsed = validateCourse({
+    title: text(formData, "title"),
+    description: text(formData, "description"),
+    objectives: text(formData, "objectives"),
+    duration: text(formData, "duration"),
+  });
+  if (!parsed.ok) return { error: parsed.error };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("courses")
+    .update({
+      title: parsed.value.title,
+      description: parsed.value.description,
+      objectives: parsed.value.objectives,
+      duration_minutes: parsed.value.durationMinutes,
+    })
+    .eq("id", courseId)
+    .select("id");
+  if (error || !data?.length) return { error: "Les modifications n'ont pas pu être enregistrées." };
+
+  revalidatePath("/", "layout");
+  return { error: null, saved: true };
+}
+
+/** Renumérote 1..n les éléments d'une liste après avoir déplacé l'un d'eux. */
+async function reorder(table: "modules" | "contents", parentColumn: string, parentId: string, itemId: string, direction: string) {
+  if (!isDirection(direction)) return;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from(table)
+    .select("id, position")
+    .eq(parentColumn, parentId)
+    .order("position")
+    .order("id")
+    .returns<{ id: string; position: number }[]>();
+  if (!data) return;
+
+  const ids = data.map((row) => row.id);
+  const reordered = moveItem(ids, ids.indexOf(itemId), direction);
+  for (let i = 0; i < reordered.length; i++) {
+    if (reordered[i] !== ids[i] || data[i]!.position !== i + 1) {
+      await supabase.from(table).update({ position: i + 1 }).eq("id", reordered[i]!);
+    }
+  }
+}
+
+export async function moveModule(formData: FormData): Promise<void> {
+  await requireUser("course:manage");
+  const courseId = text(formData, "courseId");
+  await reorder("modules", "course_id", courseId, text(formData, "moduleId"), text(formData, "direction"));
+  revalidatePath("/", "layout");
+}
+
+export async function moveContent(formData: FormData): Promise<void> {
+  await requireUser("course:manage");
+  await reorder("contents", "module_id", text(formData, "moduleId"), text(formData, "contentId"), text(formData, "direction"));
+  revalidatePath("/", "layout");
 }

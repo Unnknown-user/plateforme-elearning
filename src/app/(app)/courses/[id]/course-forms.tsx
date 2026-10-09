@@ -3,7 +3,7 @@
 import { useActionState, useRef, useState } from "react";
 import { Check, Pencil, Plus } from "lucide-react";
 import type { ContentRow } from "@/lib/courses";
-import { addContent, addModule, renameModule, updateContent, type FormState } from "../actions";
+import { addContent, addModule, renameModule, updateContent, updateCourse, type FormState } from "../actions";
 
 const field = "mt-1 w-full rounded-lg border border-zinc-400 bg-white p-2 text-sm text-zinc-900";
 const button =
@@ -173,6 +173,76 @@ export function EditContentForm({ courseId, content }: { courseId: string; conte
         {content.type === "pdf" && (
           <p className="text-sm text-zinc-600">Pour remplacer le fichier, supprimez ce contenu puis ajoutez le nouveau PDF.</p>
         )}
+        {state.error && (
+          <p role="alert" className="text-sm text-red-700">
+            {state.error}
+          </p>
+        )}
+        {state.saved && !state.error && (
+          <p role="status" className="flex items-center gap-2 text-sm text-green-700">
+            <Check className="h-4 w-4" aria-hidden /> Modifications enregistrées.
+          </p>
+        )}
+        <button type="submit" disabled={pending} className={button}>
+          {pending ? "Enregistrement…" : "Enregistrer"}
+        </button>
+      </form>
+    </details>
+  );
+}
+
+export function EditCourseForm({
+  course,
+}: {
+  course: { id: string; title: string; description: string; objectives: string; duration_minutes: number };
+}) {
+  const [state, action, pending] = useActionState<FormState, FormData>(updateCourse, { error: null });
+  return (
+    <details className="mb-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+      <summary className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-zinc-900">
+        <Pencil className="h-4 w-4" aria-hidden /> Modifier les informations du parcours
+      </summary>
+      <form action={action} className="mt-4 space-y-4">
+        <input type="hidden" name="courseId" value={course.id} />
+        <label className="block text-sm font-medium text-zinc-900">
+          Titre
+          <input name="title" defaultValue={course.title} key={course.title} required maxLength={120} className={field} />
+        </label>
+        <label className="block text-sm font-medium text-zinc-900">
+          Description
+          <textarea
+            name="description"
+            defaultValue={course.description}
+            key={course.description}
+            rows={3}
+            maxLength={2000}
+            className={field}
+          />
+        </label>
+        <label className="block text-sm font-medium text-zinc-900">
+          Objectifs pédagogiques <span className="font-normal text-zinc-600">(un par ligne)</span>
+          <textarea
+            name="objectives"
+            defaultValue={course.objectives}
+            key={course.objectives}
+            rows={4}
+            maxLength={2000}
+            className={field}
+          />
+        </label>
+        <label className="block text-sm font-medium text-zinc-900">
+          Durée estimée <span className="font-normal text-zinc-600">(en minutes)</span>
+          <input
+            name="duration"
+            type="number"
+            min={0}
+            max={100000}
+            step={1}
+            defaultValue={course.duration_minutes || ""}
+            key={course.duration_minutes}
+            className={`${field} max-w-40`}
+          />
+        </label>
         {state.error && (
           <p role="alert" className="text-sm text-red-700">
             {state.error}

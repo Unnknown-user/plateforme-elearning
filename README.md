@@ -66,3 +66,10 @@ Le logo (PNG, JPEG ou WebP, 1 Mo) peut être remplacé ou retiré (case « Retir
 Applique dans le SQL Editor de Supabase : `supabase/migrations/0003_courses.sql` puis `supabase/seed_courses.sql` (parcours fictifs en « lorem ipsum »).
 - **Formateur / administrateur** : menu « Mes parcours » → créer un parcours, ajouter / renommer des modules, ajouter, modifier ou supprimer des contenus (texte, vidéo YouTube/Vimeo, PDF) affichés comme les voit l'apprenant, publier ou repasser en brouillon, « Aperçu apprenant ».
 - **Apprenant** (`apprenant@horizon.test`) : voit uniquement les parcours **publiés** de son organisme. Le parcours « Introduction au management d'équipe » est un brouillon : il n'apparaît pas pour lui.
+
+## 10. Quiz (étape 5)
+Applique dans le SQL Editor de Supabase : `supabase/migrations/0004_quizzes.sql` puis `supabase/seed_quizzes.sql` (3 quiz fictifs).
+- **Formateur / administrateur** : sur la page d'un parcours, à la fin de chaque module, « Ajouter un quiz à ce module » : titre, seuil de réussite (%), nombre de tentatives (vide = illimité), correction affichée ou non ; puis « Ajouter une question » (choix unique, choix multiple, vrai/faux).
+- **Apprenant** : la carte du quiz apparaît à la fin du module ; il répond, voit son score, « réussi / non réussi », et la correction si elle est activée.
+- **Règle de notation** : 1 point par question ; une question est juste seulement si les bonnes réponses sont **exactement** cochées. Score = bonnes questions ÷ total ; réussite si score ≥ seuil.
+- `npm run test:isolation` vérifie aussi, sur ta vraie base, le calcul des scores, le seuil, la limite de tentatives et l'invisibilité des bonnes réponses.
