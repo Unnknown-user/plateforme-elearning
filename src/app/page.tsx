@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 // Page d'accueil provisoire. Elle deviendra la page d'accueil publique (vitrine légère) en fin de prototype.
 export default function Home() {
   return (
@@ -6,6 +8,9 @@ export default function Home() {
       <p className="max-w-md text-zinc-600">
         Prototype en construction : plateforme de formation en marque blanche pour les organismes de formation.
       </p>
+      <Link href="/login" className="rounded bg-blue-700 px-4 py-2 font-medium text-white">
+        Accéder à mon espace
+      </Link>
     </main>
   );
 }

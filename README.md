@@ -39,6 +39,7 @@ Ils seront créés à l'étape 2 (comptes et rôles), puis listés ici.
 Voir `CLAUDE.md` : périmètre, stack, décisions, avancement et feuille de route vers la commercialisation.
 
 ## 6. Comptes de démonstration (données fictives)
+Pour te connecter : lance `npm run dev`, ouvre http://localhost:3000 puis « Accéder à mon espace ».
 Il faut avoir appliqué `supabase/migrations/0001_organizations_and_profiles.sql` puis `supabase/seed.sql` dans Supabase (SQL Editor).
 Mot de passe de tous les comptes : `Demo-Elearning-2026!`
 

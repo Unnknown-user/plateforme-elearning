@@ -43,3 +43,14 @@ export function getMenu(role: Role): MenuItem[] {
   if (can(role, "organization:manage")) items.push({ label: "Paramètres de l'organisme", href: "/settings" });
   return items;
 }
+
+export const ROLE_LABELS: Record<Role, string> = {
+  admin: "Administrateur",
+  trainer: "Formateur",
+  learner: "Apprenant",
+};
+
+/** Page d'accueil de chaque rôle après connexion. */
+export function homePathFor(role: Role): string {
+  return role === "learner" ? "/learner" : "/courses";
+}

@@ -49,3 +49,13 @@ describe("menu par rôle", () => {
     expect(labels("learner")).toEqual(["Mes formations"]);
   });
 });
+
+describe("pages d'accueil et libellés", () => {
+  it("chaque rôle arrive sur sa page, l'apprenant n'arrive jamais sur l'espace formateur", async () => {
+    const { homePathFor, ROLE_LABELS } = await import("./permissions");
+    expect(homePathFor("learner")).toBe("/learner");
+    expect(homePathFor("trainer")).toBe("/courses");
+    expect(homePathFor("admin")).toBe("/courses");
+    expect(ROLE_LABELS.trainer).toBe("Formateur");
+  });
+});

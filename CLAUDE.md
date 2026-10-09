@@ -39,7 +39,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 
 ## État d'avancement
 - [x] **Étape 1** — Initialisation (projet, Git, tests, CLAUDE.md, README.md) — 2026-10-09
-- [ ] Étape 2 — Comptes et rôles + isolation + tests. FAIT : droits par rôle (permissions.ts), schéma + règles RLS (supabase/migrations), comptes de démo (supabase/seed.sql), test d'isolation sur base réelle (npm run test:isolation). RESTE : écrans de connexion et menu par rôle.
+- [x] **Étape 2** — Comptes et rôles + isolation + tests : droits par rôle (`permissions.ts`), schéma + RLS (`supabase/migrations`), comptes de démo (`supabase/seed.sql`), test d'isolation sur base réelle (`npm run test:isolation`), page de connexion, protection des pages (`src/proxy.ts`), menu par rôle — 2026-10-09
 - [ ] Étape 3 — Personnalisation marque blanche
 - [ ] Étape 4 — Création de parcours
 - [ ] Étape 5 — Quiz
@@ -56,6 +56,8 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Projet dans `plateforme-elearning/` avec son propre dépôt Git | Le dossier personnel est lui-même un dépôt Git ; éviter tout mélange |
 | 2026-10-09 | Test d'isolation contre la vraie base Supabase (hors `npm test`) | Seul moyen de prouver que les règles RLS fonctionnent ; données fictives |
 | 2026-10-09 | Noms accentués du seed écrits en séquences U&'\00e9' | Un copier-coller via le presse-papiers avait corrompu les accents |
+| 2026-10-09 | Options `cacheComponents` / `partialPrefetching` de Next.js retirées | Activées par défaut dans le modèle de projet, elles imposent des contraintes inutiles : tout l'espace connecté est propre à chaque personne (rendu à la demande) |
+| 2026-10-09 | Next.js 16 : `src/proxy.ts` remplace `middleware.ts` | Convention officielle de cette version |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
