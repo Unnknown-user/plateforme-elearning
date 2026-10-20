@@ -114,12 +114,10 @@ export async function loadTracking(options: { learnerId?: string; courseId?: str
   const attemptRows = attempts.data ?? [];
 
   // Seules les inscriptions comptent : un apprenant n'apparaît que dans les parcours auxquels il est inscrit.
-  // (La base ne renvoie à un apprenant que ses propres inscriptions.)
-  const { data: enrollmentRows } = await supabase
-    .from("enrollments")
-    .select("learner_id, course_id")
-    .returns<{ learner_id: string; course_id: string }[]>();
-  const enrolled = new Set((enrollmentRows ?? []).map((e) => `${e.learner_id}:${e.course_id}`));
+  // « effective_enrollments » réunit inscriptions individuelles et par groupe (la base applique les droits).
+  const { data: enrollmentData } = await supabase.rpc("effective_enrollments");
+  const enrollmentRows = (enrollmentData ?? []) as { learner_id: string; course_id: string }[];
+  const enrolled = new Set(enrollmentRows.map((e) => `${e.learner_id}:${e.course_id}`));
 
   const rows: TrackingRow[] = [];
   for (const learner of learners) {

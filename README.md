@@ -51,6 +51,7 @@ Ce fichier ne part jamais sur Git. Sur un nouvel ordinateur, il faut le recréer
 | 11 | `supabase/migrations/0007_duplicate_course.sql` | Duplication d'un parcours (étape 9) |
 | 12 | `supabase/migrations/0008_enrollments.sql` | Inscriptions des apprenants aux parcours (étape 10) |
 | 13 | `supabase/migrations/0009_fix_courses_select.sql` | Correctif de 0008 (création d'un parcours) |
+| 14 | `supabase/migrations/0010_groups.sql` | Groupes d'apprenants (étape 10b) |
 
 > Astuce Mac : `cat fichier.sql | LC_ALL=en_US.UTF-8 pbcopy` copie le fichier dans le presse-papiers en gardant les accents. Colle ensuite avec Cmd + V.
 > Les projets Supabase gratuits s'endorment après environ 7 jours sans activité : dans ce cas, clique sur **Restore** dans leur tableau de bord.

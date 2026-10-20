@@ -59,3 +59,13 @@ describe("pages d'accueil et libellés", () => {
     expect(ROLE_LABELS.trainer).toBe("Formateur");
   });
 });
+
+describe("menu : groupes", () => {
+  const labels = (r: Parameters<typeof getMenu>[0]) => getMenu(r).map((i) => i.label);
+
+  it("l'administrateur et le formateur voient « Groupes », pas l'apprenant", () => {
+    expect(labels("admin")).toContain("Groupes");
+    expect(labels("trainer")).toContain("Groupes");
+    expect(labels("learner")).not.toContain("Groupes");
+  });
+});

@@ -52,3 +52,30 @@ export async function unenrollLearner(formData: FormData): Promise<void> {
   assertChanged(error, data, "La désinscription n'a pas pu être enregistrée.");
   revalidatePath(`/courses/${text(formData, "courseId")}`);
 }
+
+// Inscription d'un groupe entier : tous ses membres (présents et futurs) accèdent au parcours.
+export async function enrollGroup(formData: FormData): Promise<void> {
+  const user = await requireUser("course:manage");
+  const supabase = await createClient();
+  const courseId = text(formData, "courseId");
+  const { error } = await supabase.from("group_enrollments").upsert(
+    { organization_id: user.organization.id, group_id: text(formData, "groupId"), course_id: courseId, enrolled_by: user.id },
+    { onConflict: "group_id,course_id", ignoreDuplicates: true },
+  );
+  if (error) throw new Error("Le groupe n'a pas pu être inscrit.");
+  revalidatePath(`/courses/${courseId}`);
+}
+
+export async function unenrollGroup(formData: FormData): Promise<void> {
+  await requireUser("course:manage");
+  const supabase = await createClient();
+  const courseId = text(formData, "courseId");
+  const { data, error } = await supabase
+    .from("group_enrollments")
+    .delete()
+    .eq("course_id", courseId)
+    .eq("group_id", text(formData, "groupId"))
+    .select("group_id");
+  assertChanged(error, data, "Le groupe n'a pas pu être désinscrit.");
+  revalidatePath(`/courses/${courseId}`);
+}

@@ -32,7 +32,7 @@ export function canAccessOrganization(userOrganizationId: string, targetOrganiza
   return userOrganizationId === targetOrganizationId;
 }
 
-export type MenuIcon = "learner" | "courses" | "learners" | "settings";
+export type MenuIcon = "learner" | "courses" | "learners" | "groups" | "settings";
 export type MenuItem = { label: string; href: string; icon: MenuIcon };
 
 /** Menu affiché selon le rôle (libellés visibles en français). */
@@ -41,6 +41,7 @@ export function getMenu(role: Role): MenuItem[] {
   if (role === "learner") items.push({ label: "Mes formations", href: "/learner", icon: "learner" });
   if (can(role, "course:manage")) items.push({ label: "Mes parcours", href: "/courses", icon: "courses" });
   if (can(role, "learners:view")) items.push({ label: "Apprenants et suivi", href: "/learners", icon: "learners" });
+  if (can(role, "learners:view")) items.push({ label: "Groupes", href: "/groups", icon: "groups" });
   if (can(role, "organization:manage")) {
     items.push({ label: "Paramètres de l'organisme", href: "/settings", icon: "settings" });
   }

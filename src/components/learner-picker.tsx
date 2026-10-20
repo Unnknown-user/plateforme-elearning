@@ -2,15 +2,27 @@
 
 import { useMemo, useState } from "react";
 import { Search, UserPlus } from "lucide-react";
-import { enrollLearners } from "@/app/(app)/courses/enrollment-actions";
 import { filterLearners, formatFamilyFirst, sortByFamilyName } from "@/lib/learner-search";
 import type { EnrollmentLearner } from "@/lib/enrollments";
 
 /**
- * Inscription d'apprenants : recherche par nom, cases à cocher, un seul bouton « Inscrire ».
+ * Choix d'apprenants : recherche par nom, cases à cocher, un seul bouton d'envoi.
  * La sélection est conservée quand on change la recherche (on peut chercher, cocher, chercher encore).
+ * Sert à inscrire à un parcours et à remplir un groupe : l'action et les champs fixes viennent de l'appelant.
  */
-export function EnrollSearch({ courseId, learners }: { courseId: string; learners: EnrollmentLearner[] }) {
+export function LearnerPicker({
+  action,
+  fields,
+  learners,
+  title,
+  submitLabel,
+}: {
+  action: (formData: FormData) => Promise<void>;
+  fields: Record<string, string>;
+  learners: EnrollmentLearner[];
+  title: string;
+  submitLabel: string;
+}) {
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<Set<string>>(new Set());
   // Après une inscription, les personnes inscrites quittent la liste : on les retire aussi de la sélection.
@@ -38,15 +50,17 @@ export function EnrollSearch({ courseId, learners }: { courseId: string; learner
     });
 
   return (
-    <form action={enrollLearners} className="space-y-3">
-      <input type="hidden" name="courseId" value={courseId} />
+    <form action={action} className="space-y-3">
+      {Object.entries(fields).map(([name, value]) => (
+        <input key={name} type="hidden" name={name} value={value} />
+      ))}
       {/* Les personnes cochées sont envoyées même si la recherche les masque. */}
       {[...selected].map((id) => (
         <input key={id} type="hidden" name="learnerId" value={id} />
       ))}
 
       <label className="block text-sm font-medium text-zinc-900">
-        Inscrire des apprenants
+        {title}
         <span className="relative mt-1 block">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" aria-hidden />
           <input
@@ -95,7 +109,7 @@ export function EnrollSearch({ courseId, learners }: { courseId: string; learner
         disabled={selected.size === 0}
         className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-[var(--brand-contrast)] disabled:opacity-50"
       >
-        <UserPlus className="h-4 w-4" aria-hidden /> Inscrire{selected.size > 0 ? ` (${selected.size})` : ""}
+        <UserPlus className="h-4 w-4" aria-hidden /> {submitLabel}{selected.size > 0 ? ` (${selected.size})` : ""}
       </button>
     </form>
   );

@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, GraduationCap, Settings, Users, type LucideIcon } from "lucide-react";
+import { BookOpen, GraduationCap, Settings, Users, UsersRound, type LucideIcon } from "lucide-react";
 import type { MenuIcon, MenuItem } from "@/lib/permissions";
 
 const ICONS: Record<MenuIcon, LucideIcon> = {
   learner: GraduationCap,
   courses: BookOpen,
   learners: Users,
+  groups: UsersRound,
   settings: Settings,
 };
 
