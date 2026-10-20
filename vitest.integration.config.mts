@@ -7,6 +7,9 @@ export default defineConfig(({ mode }) => ({
   test: {
     environment: "node",
     include: ["tests/**/*.integration.test.ts"],
+    // Ces tests passent par Internet (Supabase) : 5 s par défaut est parfois trop court.
+    testTimeout: 30000,
+    hookTimeout: 30000,
     env: loadEnv(mode, process.cwd(), ""),
   },
 }));

@@ -56,8 +56,8 @@ describe.skipIf(!url || !anonKey)("duplication d'un parcours (base réelle)", ()
     sourceId = course!.id;
     const [module] = await insert("modules", trainer, { organization_id: ORG, course_id: sourceId, title: "Module 1", position: 1 });
     await insert("contents", trainer, [
-      { organization_id: ORG, module_id: module!.id, type: "text", title: "Texte", body: "Contenu", position: 1 },
-      { organization_id: ORG, module_id: module!.id, type: "pdf", title: "Support", file_path: pdfPath, position: 2 },
+      { organization_id: ORG, module_id: module!.id, type: "text", title: "Texte", body: "Contenu", file_path: null, position: 1 },
+      { organization_id: ORG, module_id: module!.id, type: "pdf", title: "Support", body: null, file_path: pdfPath, position: 2 },
     ]);
     const [quiz] = await insert("quizzes", trainer, {
       organization_id: ORG, module_id: module!.id, title: "Quiz", pass_threshold: 60, max_attempts: 2, show_correction: false,
@@ -104,7 +104,9 @@ describe.skipIf(!url || !anonKey)("duplication d'un parcours (base réelle)", ()
       `choices?select=label,choice_keys(is_correct),questions!inner(quiz_id)&questions.quiz_id=eq.${quizzes[0]!.id}&order=position`,
       trainer,
     );
-    expect(choices.map((c) => [c.label, (c.choice_keys as { is_correct: boolean }).is_correct])).toEqual([["Oui", true], ["Non", false]]);
+    // Selon la relation, la base renvoie un objet ou une liste d'un élément.
+    const correct = (c: Row) => [c.choice_keys].flat().map((k) => (k as { is_correct: boolean }).is_correct)[0];
+    expect(choices.map((c) => [c.label, correct(c)])).toEqual([["Oui", true], ["Non", false]]);
   });
 
   it("chaque copie a son propre fichier PDF (supprimer l'un ne touche pas l'autre)", async () => {
