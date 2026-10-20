@@ -2,6 +2,7 @@ import { Award, BarChart3, CheckCircle2, ClipboardList, Download, Users } from "
 import { ProgressBar, StatCard, TrackingBadge } from "@/components/course-ui";
 import { Card, PageHeader } from "@/components/page-header";
 import { initials } from "@/lib/branding";
+import { formatFamilyFirst } from "@/lib/learner-search";
 import { formatDateFr, formatSeconds } from "@/lib/tracking";
 import { loadTracking } from "@/lib/tracking-data";
 import { requireUser } from "@/lib/session";
@@ -76,7 +77,7 @@ export default async function LearnersPage() {
                       >
                         {initials(learner.fullName)}
                       </span>
-                      <span className="font-medium text-zinc-900">{learner.fullName}</span>
+                      <span className="font-medium text-zinc-900">{formatFamilyFirst(learner.fullName)}</span>
                     </span>
                   </td>
                   <td className="px-4 py-3 text-zinc-800">{course.title}</td>

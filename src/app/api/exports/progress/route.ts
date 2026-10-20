@@ -1,5 +1,6 @@
 import { toCsv } from "@/lib/csv";
 import { can } from "@/lib/permissions";
+import { formatFamilyFirst } from "@/lib/learner-search";
 import { getCurrentUser } from "@/lib/session";
 import { formatDateTimeFr, STATUS_LABELS } from "@/lib/tracking";
 import { loadTracking } from "@/lib/tracking-data";
@@ -18,7 +19,7 @@ export async function GET() {
       "Temps passé (minutes)", "Première activité", "Dernière activité", "Date de fin",
     ],
     rows.map(({ learner, course, tracking: t }) => [
-      learner.fullName, course.title, STATUS_LABELS[t.status], t.percent, t.doneContents, t.totalContents,
+      formatFamilyFirst(learner.fullName), course.title, STATUS_LABELS[t.status], t.percent, t.doneContents, t.totalContents,
       t.passedQuizzes, t.totalQuizzes, t.averageBestScore, t.attemptsCount,
       Math.round(t.timeSeconds / 60), t.startedAt ? formatDateTimeFr(t.startedAt) : null,
       t.lastActivityAt ? formatDateTimeFr(t.lastActivityAt) : null, t.completedAt ? formatDateTimeFr(t.completedAt) : null,

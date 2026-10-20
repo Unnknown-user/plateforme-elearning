@@ -1,5 +1,6 @@
 import { toCsv } from "@/lib/csv";
 import { can } from "@/lib/permissions";
+import { formatFamilyFirst } from "@/lib/learner-search";
 import { getCurrentUser } from "@/lib/session";
 import { formatDateTimeFr } from "@/lib/tracking";
 import { loadTracking } from "@/lib/tracking-data";
@@ -11,7 +12,7 @@ export async function GET() {
   if (!can(user.role, "reports:export")) return Response.json({ error: "Accès refusé." }, { status: 403 });
 
   const { attempts, courses, learners } = await loadTracking();
-  const learnerName = new Map(learners.map((l) => [l.id, l.fullName]));
+  const learnerName = new Map(learners.map((l) => [l.id, formatFamilyFirst(l.fullName)]));
   const quizInfo = new Map(courses.flatMap((c) => c.quizzes.map((q) => [q.id, { quiz: q.title, course: c.title }] as const)));
 
   const counters = new Map<string, number>();

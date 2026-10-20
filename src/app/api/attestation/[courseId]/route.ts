@@ -1,5 +1,6 @@
 import { generateAttestation } from "@/lib/attestation";
 import { can } from "@/lib/permissions";
+import { formatFamilyFirst } from "@/lib/learner-search";
 import { getCurrentUser } from "@/lib/session";
 import { slugify } from "@/lib/tracking";
 import { loadTracking } from "@/lib/tracking-data";
@@ -65,7 +66,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ cour
       primaryColor: organization.primaryColor,
       logo: await fetchLogo(organization.logoUrl),
     },
-    learnerName: row.learner.fullName,
+    learnerName: formatFamilyFirst(row.learner.fullName),
     courseTitle: row.course.title,
     plannedMinutes: row.course.durationMinutes,
     timeSeconds: row.tracking.timeSeconds,

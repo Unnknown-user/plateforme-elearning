@@ -2,6 +2,7 @@
 // Les droits sont appliqués par la base : un apprenant ne reçoit que ses traces, le personnel celles de son organisme.
 import { createClient } from "@/lib/supabase/server";
 import { buildTracking, type CourseTracking } from "@/lib/tracking";
+import { sortByFamilyName } from "@/lib/learner-search";
 
 export type TrackedCourse = {
   id: string;
@@ -74,7 +75,8 @@ export async function loadTracking(options: { learnerId?: string; courseId?: str
   let learnerQuery = supabase.from("profiles").select("id, full_name").eq("role", "learner").order("full_name");
   if (options.learnerId) learnerQuery = learnerQuery.eq("id", options.learnerId);
   const { data: learnerRows } = await learnerQuery.returns<{ id: string; full_name: string }[]>();
-  const learners = (learnerRows ?? []).map((l) => ({ id: l.id, fullName: l.full_name }));
+  // Classés par nom de famille, comme dans les listes d'inscription : l'ordre se retrouve dans le tableau et les exports.
+  const learners = sortByFamilyName((learnerRows ?? []).map((l) => ({ id: l.id, fullName: l.full_name })));
 
   const learnerIds = learners.map((l) => l.id);
   const contentIds = courses.flatMap((c) => c.contentIds);
