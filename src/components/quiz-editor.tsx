@@ -2,8 +2,9 @@ import { CheckCircle2, Circle, ListChecks, Trash2 } from "lucide-react";
 import { QUESTION_TYPE_LABELS } from "@/lib/quiz";
 import type { QuizRow } from "@/lib/quizzes";
 import { ConfirmButton } from "@/components/confirm-button";
-import { deleteQuestion, deleteQuiz } from "@/app/(app)/courses/quiz-actions";
-import { AddQuestionForm, CreateQuizForm, QuizSettingsForm } from "@/app/(app)/courses/[id]/quiz-forms";
+import { MoveButtons } from "@/components/move-buttons";
+import { deleteQuestion, deleteQuiz, moveQuestion } from "@/app/(app)/courses/quiz-actions";
+import { AddQuestionForm, CreateQuizForm, EditQuestionForm, QuizSettingsForm } from "@/app/(app)/courses/[id]/quiz-forms";
 
 /** Bloc « quiz » d'un module, côté formateur : réglages, questions avec leurs bonnes réponses. */
 export function QuizEditor({ moduleId, quiz }: { moduleId: string; quiz: QuizRow | undefined }) {
@@ -43,16 +44,25 @@ export function QuizEditor({ moduleId, quiz }: { moduleId: string; quiz: QuizRow
               <p className="font-medium text-zinc-900">
                 {index + 1}. {question.prompt}
               </p>
-              <form action={deleteQuestion}>
-                <input type="hidden" name="questionId" value={question.id} />
-                <ConfirmButton
-                  message="Supprimer cette question ?"
-                  title="Supprimer la question"
-                  className="rounded-lg p-1.5 text-zinc-500 hover:bg-red-50 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" aria-hidden />
-                </ConfirmButton>
-              </form>
+              <div className="flex shrink-0 items-center">
+                <MoveButtons
+                  action={moveQuestion}
+                  fields={{ quizId: quiz.id, questionId: question.id }}
+                  index={index}
+                  count={quiz.questions.length}
+                  label="la question"
+                />
+                <form action={deleteQuestion}>
+                  <input type="hidden" name="questionId" value={question.id} />
+                  <ConfirmButton
+                    message="Supprimer cette question ?"
+                    title="Supprimer la question"
+                    className="rounded-lg p-2 text-zinc-500 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden />
+                  </ConfirmButton>
+                </form>
+              </div>
             </div>
             <p className="mb-2 text-xs text-zinc-600">{QUESTION_TYPE_LABELS[question.type]}</p>
             <ul className="space-y-1 text-sm">
@@ -68,6 +78,7 @@ export function QuizEditor({ moduleId, quiz }: { moduleId: string; quiz: QuizRow
               ))}
             </ul>
             {question.explanation && <p className="mt-2 text-xs text-zinc-600">Explication : {question.explanation}</p>}
+            <EditQuestionForm question={question} />
           </li>
         ))}
         {quiz.questions.length === 0 && (

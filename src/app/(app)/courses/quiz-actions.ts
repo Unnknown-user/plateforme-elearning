@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/session";
 import { validateQuestion, validateQuizSettings } from "@/lib/quiz";
 import { assertChanged } from "@/lib/action-error";
+import { reorder } from "@/lib/reorder";
 import type { FormState } from "./actions";
 
 const text = (data: FormData, key: string) => String(data.get(key) ?? "");
@@ -70,17 +71,21 @@ export async function deleteQuiz(formData: FormData): Promise<void> {
   revalidatePath("/", "layout");
 }
 
-export async function addQuestion(_prev: FormState, formData: FormData): Promise<FormState> {
-  const user = await requireUser("course:manage");
-  const quizId = text(formData, "quizId");
-
-  const parsed = validateQuestion({
+function questionFrom(formData: FormData) {
+  return validateQuestion({
     type: text(formData, "type"),
     prompt: text(formData, "prompt"),
     explanation: text(formData, "explanation"),
     choices: formData.getAll("choice").map(String),
     correct: formData.getAll("correct").map(Number).filter(Number.isInteger),
   });
+}
+
+export async function addQuestion(_prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireUser("course:manage");
+  const quizId = text(formData, "quizId");
+
+  const parsed = questionFrom(formData);
   if (!parsed.ok) return { error: parsed.error };
 
   const supabase = await createClient();
@@ -140,5 +145,32 @@ export async function deleteQuestion(formData: FormData): Promise<void> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("questions").delete().eq("id", text(formData, "questionId")).select("id");
   assertChanged(error, data, "La question n'a pas pu être supprimée.");
+  revalidatePath("/", "layout");
+}
+
+// La modification passe par la fonction SQL update_question : question, choix et bonnes réponses
+// sont changés en une seule opération, qui réussit ou échoue en entier.
+export async function updateQuestion(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireUser("course:manage");
+  const parsed = questionFrom(formData);
+  if (!parsed.ok) return { error: parsed.error };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_question", {
+    p_question_id: text(formData, "questionId"),
+    p_type: parsed.value.type,
+    p_prompt: parsed.value.prompt,
+    p_explanation: parsed.value.explanation,
+    p_choices: parsed.value.choices.map((choice) => ({ label: choice.label, is_correct: choice.isCorrect })),
+  });
+  if (error) return { error: "La question n'a pas pu être modifiée." };
+
+  revalidatePath("/", "layout");
+  return { error: null, saved: true };
+}
+
+export async function moveQuestion(formData: FormData): Promise<void> {
+  await requireUser("course:manage");
+  await reorder("questions", "quiz_id", text(formData, "quizId"), text(formData, "questionId"), text(formData, "direction"));
   revalidatePath("/", "layout");
 }

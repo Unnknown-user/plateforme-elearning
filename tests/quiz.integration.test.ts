@@ -212,4 +212,48 @@ describe.skipIf(!url || !anonKey)("quiz : score, seuil, tentatives, droits (base
     });
     expect(tamper.ok ? ((await tamper.json()) as Row[]) : []).toEqual([]);
   });
+
+  // Nécessite 0006_update_question.sql appliqué.
+  describe("modification d'une question (update_question)", () => {
+    const update = (token: string, questionId: string, choices: object[], prompt = "Q1 modifiée") =>
+      fetch(`${url}/rest/v1/rpc/update_question`, {
+        method: "POST",
+        headers: headers(token),
+        body: JSON.stringify({
+          p_question_id: questionId, p_type: "single", p_prompt: prompt, p_explanation: "Nouvelle explication", p_choices: choices,
+        }),
+      });
+
+    it("le formateur modifie énoncé, choix et bonne réponse ; le score suit la nouvelle clé", async () => {
+      const res = await update(trainer, q.single.id, [
+        { label: "X", is_correct: false },
+        { label: "Y", is_correct: true },
+      ]);
+      expect(res.ok).toBe(true);
+
+      const [question] = await select(`questions?select=prompt,explanation&id=eq.${q.single.id}`, trainer);
+      expect(question).toMatchObject({ prompt: "Q1 modifiée", explanation: "Nouvelle explication" });
+      const choices = await select(`choices?select=id,label,position,choice_keys(is_correct)&question_id=eq.${q.single.id}&order=position`, trainer);
+      expect(choices.map((c) => c.label)).toEqual(["X", "Y"]);
+
+      // Les anciens choix ont disparu : répondre avec eux ne rapporte rien, répondre « Y » rapporte le point.
+      const y = choices[1]!.id;
+      const answers = { ...perfect(), [q.single.id]: [y] };
+      expect((await submit(learner, quizId, answers)).body).toMatchObject({ score_percent: 100, points: 3 });
+      expect((await submit(learner, quizId, perfect())).body).toMatchObject({ points: 2 });
+    });
+
+    it("l'apprenant et un autre organisme sont refusés, la question ne change pas", async () => {
+      const intruder = [{ label: "Z", is_correct: true }, { label: "W", is_correct: false }];
+      const asLearner = await update(learner, q.multiple.id, intruder, "piratée");
+      expect(asLearner.ok).toBe(false);
+
+      const otherTrainerRes = await update(await signIn("admin@lumiere.test"), q.multiple.id, intruder, "piratée");
+      expect(otherTrainerRes.ok).toBe(false);
+
+      const [question] = await select(`questions?select=prompt&id=eq.${q.multiple.id}`, trainer);
+      expect(question!.prompt).toBe("Q2");
+      expect(await select(`choices?select=id&question_id=eq.${q.multiple.id}`, trainer)).toHaveLength(4);
+    });
+  });
 });
