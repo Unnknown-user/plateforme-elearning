@@ -52,7 +52,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 - [x] **Étape 8a** — Fiabilisation : erreurs d'actions visibles, confirmation avant suppression, page d'erreur — 2026-10-20
 - [x] **Étape 8** — Quiz : modifier et réordonner les questions après création (fonction SQL `update_question`, migration 0006, tests sur base réelle) — 2026-10-20
 - [x] **Étape 9** — Dupliquer un parcours (modules, contenus, quiz, PDF ; copie en brouillon ; fonction SQL `duplicate_course`, migration 0007, tests sur base réelle) — 2026-10-20
-- [ ] **Étape 10** — Inscription des apprenants à un parcours (individuelle puis par groupe) ; l'apprenant ne voit plus que ses parcours (RLS + tests d'isolation). 10a (individuelle, migrations 0008 + correctif 0009, tests sur base réelle 51/51) : validée le 2026-10-20 ; 10b (groupes) : code terminé le 2026-10-20, reste à appliquer `0010_groups.sql` et lancer `npm run test:isolation`
+- [x] **Étape 10** — Inscription des apprenants aux parcours, individuelle (10a : table `enrollments`, règle d'accès unique `can_access_course`, migrations 0008 + correctif 0009) et par groupe (10b : groupes d'apprenants, page « Groupes », migration 0010) ; l'apprenant ne voit que les parcours publiés auxquels il est inscrit. Recherche par nom et cases à cocher pour inscrire. Tests sur base réelle 60/60 — 2026-10-20
 - [ ] **Étape 11** — Création / invitation des utilisateurs depuis l'interface (admin) ; touche à la sécurité (clé de service côté serveur uniquement)
 - [ ] **Étape 12** — Tableau de bord administrateur : taux de complétion, apprenants en retard, parcours les plus suivis
 - [ ] **Étape 13** — Marque blanche poussée : texte d'accueil et bandeau de connexion par organisme, attestation aux couleurs de l'organisme
@@ -92,6 +92,14 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Script `supabase/reset_demo.sql` limité aux deux organismes fictifs | Rejouer la démo à l'identique (tentatives de quiz limitées, couleurs modifiées en direct) |
 | 2026-10-20 | Actions serveur à bouton simple : `assertChanged` lève une erreur si la base échoue ou ignore l'écriture (RLS) ; page `error.tsx` en français ; confirmation avant toute suppression (`ConfirmButton`) | Une suppression refusée paraissait réussie ; un clic accidentel effaçait un parcours entier |
 | 2026-10-20 | Extension du périmètre validée par Mélissa : étapes 8 à 15 (voir « Phase d'extensions »), déploiement Vercel repoussé après elles (étape 16) | Démo plus crédible (inscriptions, invitations, tableau de bord, Qualiopi) ; le périmètre reste les 5 fonctionnalités, étendues |
+| 2026-10-20 | Accès d'un apprenant = parcours publié ET (inscription individuelle OU membre d'un groupe inscrit), écrit en un seul endroit SQL (`is_enrolled`, `can_access_course`) ; le personnel voit tout | Une règle unique évite qu'une table oublie la vérification ; les groupes l'ont étendue sans toucher aux autres règles |
+| 2026-10-20 | Désinscription, retrait d'un groupe ou suppression d'un groupe : l'accès est retiré, les traces (contenus terminés, temps, tentatives) sont conservées | Historique consultable par le personnel (Qualiopi) ; effacement à traiter avec le RGPD |
+| 2026-10-20 | Reprise de l'existant à la migration 0008 : tous les apprenants inscrits aux parcours déjà publiés ; `reset_demo.sql` fait de même | La démo continue de fonctionner à l'identique |
+| 2026-10-20 | Groupes et inscriptions : réservés au personnel (RLS) ; un apprenant ne les voit pas ; un compte non apprenant ne peut être ni inscrit ni membre ; nom de groupe unique par organisme (casse ignorée) | Confidentialité entre apprenants, cohérence des données |
+| 2026-10-20 | Duplication d'un parcours par fonction SQL `duplicate_course` (droits de l'appelant) + copie des PDF côté application ; copie en brouillon, sans inscriptions ni traces ; chaque copie a ses propres fichiers PDF | Atomicité en base ; supprimer un PDF d'une copie n'efface jamais celui de l'original |
+| 2026-10-20 | Modification d'une question de quiz par fonction SQL `update_question` ; choix recréés, tentatives déjà enregistrées non recalculées | Pas de question à moitié modifiée ; l'historique des notes reste fidèle à ce que l'apprenant a vu |
+| 2026-10-20 | Noms d'apprenants affichés « NOM Prénom » (suivi, exports CSV, attestation, listes d'inscription) et triés par nom de famille ; le nom de famille est le dernier mot du nom complet | Demande de Mélissa ; hypothèse à lever en séparant prénom et nom à l'étape 11 (limite : « Le Gall ») |
+| 2026-10-20 | Tests sur base réelle : délai relevé à 30 s | Les tests passent par Internet ; 5 s provoquait des échecs aléatoires |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
@@ -109,7 +117,7 @@ Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE. À trai
 3. ⚠️ **Comptes de démo** : mot de passe unique et simple, tables d'authentification alimentées par SQL direct : à supprimer avant toute mise en production.
 
 ### Priorité 2 — Avant la mise en vente
-4. ⚠️ **Conformité Qualiopi et attestation** : mentions de l'attestation et colonnes des exports à valider avec Mélissa et un auditeur ; registre numéroté des attestations émises ; signature électronique ; modèle personnalisable ; évaluations à chaud / à froid ; émargement.
+4. ⚠️ **Conformité Qualiopi et attestation** : format « NOM Prénom » de l'attestation à valider ; mentions de l'attestation et colonnes des exports à valider avec Mélissa et un auditeur ; registre numéroté des attestations émises ; signature électronique ; modèle personnalisable ; évaluations à chaud / à froid ; émargement.
 5. ⚠️ **Fiabilité des traces** : le temps passé mesure la présence active à l'écran (approximation, pas une preuve d'assiduité) ; « contenu terminé » est déclaratif ; la règle d'avancement est à valider.
 6. ⚠️ **Quiz** : règle de notation à valider (points partiels ? pondération ?) ; questions non modifiables ni réordonnables après création ; pas de banque de questions, de tirage aléatoire ni de chronomètre.
 7. ⚠️ **Hébergement de production** : environnements séparés (test / production), supervision, plan de reprise, nom de domaine, sous-domaine par organisme, e-mails transactionnels.
@@ -118,7 +126,7 @@ Classée par priorité. Marqueur : ⚠️ À REVOIR AVANT MISE EN VENTE. À trai
 
 ### Priorité 3 — Qualité et croissance
 10. ⚠️ **Accessibilité (RGAA)** : audit complet (contrastes des couleurs choisies par les organismes, navigation au clavier, lecteurs d'écran) ; thème clair uniquement (pas de mode sombre).
-11. ⚠️ **Performance à l'échelle** : pagination des listes, index, mise en cache, volumétrie.
+11. ⚠️ **Performance à l'échelle** : pagination des listes, index, mise en cache, volumétrie ; les règles d'accès (`can_access_course`, `is_enrolled`) sont des fonctions SQL appelées ligne par ligne, à mesurer avec beaucoup de données ; la liste des apprenants (inscriptions, groupes) n'est pas paginée.
 12. ⚠️ **Tests de bout en bout** (Playwright) en plus des tests unitaires et des tests sur base réelle ; la mesure du temps passé n'est pas testée dans un navigateur.
 13. ⚠️ **Dépendances de développement** : `npm audit` signale 5 vulnérabilités « high » dans l'outil de lint (`eslint-config-next` → `braces`), sans effet en production ; à traiter à la prochaine montée de version.
 14. ⚠️ SCORM / xAPI · facturation et abonnements · CGV / CGU · notifications e-mail · application mobile.
