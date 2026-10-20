@@ -62,10 +62,14 @@ language sql stable security definer set search_path = '' as $$
       and (public.is_staff() or (c.status = 'published' and public.is_enrolled(c.id))))
 $$;
 
--- Parcours, modules, contenus : toutes les lectures passent par can_access_course.
+-- Parcours : la règle lit directement les colonnes de la ligne (voir 0009 : relire la table échouait
+-- à la création d'un parcours). Modules, contenus : lectures via can_access_course.
 drop policy "courses_select" on public.courses;
 create policy "courses_select" on public.courses for select to authenticated
-  using (organization_id = public.current_org_id() and public.can_access_course(id));
+  using (
+    organization_id = public.current_org_id()
+    and (public.is_staff() or (status = 'published' and public.is_enrolled(id)))
+  );
 
 drop policy "modules_select" on public.modules;
 create policy "modules_select" on public.modules for select to authenticated
