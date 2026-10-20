@@ -52,7 +52,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 - [x] **Étape 8a** — Fiabilisation : erreurs d'actions visibles, confirmation avant suppression, page d'erreur — 2026-10-20
 - [x] **Étape 8** — Quiz : modifier et réordonner les questions après création (fonction SQL `update_question`, migration 0006, tests sur base réelle) — 2026-10-20
 - [x] **Étape 9** — Dupliquer un parcours (modules, contenus, quiz, PDF ; copie en brouillon ; fonction SQL `duplicate_course`, migration 0007, tests sur base réelle) — 2026-10-20
-- [ ] **Étape 10** — Inscription des apprenants à un parcours (individuelle puis par groupe) ; l'apprenant ne voit plus que ses parcours (RLS + tests d'isolation). 10a (individuelle) : code terminé le 2026-10-20, reste à appliquer `0008_enrollments.sql` et lancer `npm run test:isolation` ; 10b (groupes) : à faire
+- [ ] **Étape 10** — Inscription des apprenants à un parcours (individuelle puis par groupe) ; l'apprenant ne voit plus que ses parcours (RLS + tests d'isolation). 10a (individuelle, migrations 0008 + correctif 0009, tests sur base réelle 51/51) : validée le 2026-10-20 ; 10b (groupes) : à faire
 - [ ] **Étape 11** — Création / invitation des utilisateurs depuis l'interface (admin) ; touche à la sécurité (clé de service côté serveur uniquement)
 - [ ] **Étape 12** — Tableau de bord administrateur : taux de complétion, apprenants en retard, parcours les plus suivis
 - [ ] **Étape 13** — Marque blanche poussée : texte d'accueil et bandeau de connexion par organisme, attestation aux couleurs de l'organisme
