@@ -15,7 +15,7 @@ export default async function LearnerPage() {
     <>
       <PageHeader title={`Bonjour ${firstName} 👋`} description="Retrouvez ici les formations de votre organisme." />
       {courses.length === 0 ? (
-        <Card className="py-14 text-center text-zinc-600">Aucune formation disponible pour le moment.</Card>
+        <Card className="py-14 text-center text-zinc-600">Aucune formation ne vous est attribuée pour le moment. Votre organisme vous inscrira à vos parcours.</Card>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {courses.map((course, i) => {

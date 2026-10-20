@@ -33,3 +33,12 @@ update public.courses set status = 'published' where id in (
   'c1000000-0000-4000-8000-000000000004', 'c2000000-0000-4000-8000-000000000001');
 update public.courses set status = 'draft' where id in (
   'c1000000-0000-4000-8000-000000000003', 'c2000000-0000-4000-8000-000000000002');
+
+-- Inscriptions (étape 10) : les apprenants de démonstration sont réinscrits aux parcours publiés de départ.
+insert into public.enrollments (organization_id, course_id, learner_id)
+select c.organization_id, c.id, p.id
+from public.courses c
+join public.profiles p on p.organization_id = c.organization_id and p.role = 'learner'
+where c.status = 'published'
+  and c.organization_id in ('a0000000-0000-4000-8000-000000000001', 'b0000000-0000-4000-8000-000000000002')
+on conflict do nothing;

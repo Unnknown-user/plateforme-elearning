@@ -53,6 +53,8 @@ describe.skipIf(!url || !anonKey)("suivi : contenus terminés, temps, confidenti
     ]);
     const [course] = await insert("courses", trainer, { organization_id: ORG, title: "Parcours de test suivi", status: "published" });
     courseId = course!.id;
+    // Depuis l'étape 10, un apprenant ne voit un parcours que s'il y est inscrit.
+    await insert("enrollments", trainer, { organization_id: ORG, course_id: courseId, learner_id: LEA });
     const [module] = await insert("modules", trainer, { organization_id: ORG, course_id: courseId, title: "Module", position: 1 });
     const contents = await insert("contents", trainer, [
       { organization_id: ORG, module_id: module!.id, type: "text", title: "Un", body: "x", position: 1 },

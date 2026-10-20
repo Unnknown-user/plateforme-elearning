@@ -111,9 +111,18 @@ export async function loadTracking(options: { learnerId?: string; courseId?: str
   const timeRows = times.data ?? [];
   const attemptRows = attempts.data ?? [];
 
+  // Seules les inscriptions comptent : un apprenant n'apparaît que dans les parcours auxquels il est inscrit.
+  // (La base ne renvoie à un apprenant que ses propres inscriptions.)
+  const { data: enrollmentRows } = await supabase
+    .from("enrollments")
+    .select("learner_id, course_id")
+    .returns<{ learner_id: string; course_id: string }[]>();
+  const enrolled = new Set((enrollmentRows ?? []).map((e) => `${e.learner_id}:${e.course_id}`));
+
   const rows: TrackingRow[] = [];
   for (const learner of learners) {
     for (const course of courses) {
+      if (!enrolled.has(`${learner.id}:${course.id}`)) continue;
       const time = timeRows.find((t) => t.learner_id === learner.id && t.course_id === course.id);
       rows.push({
         learner,

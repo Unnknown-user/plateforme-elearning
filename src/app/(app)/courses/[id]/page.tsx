@@ -9,7 +9,9 @@ import { getCourse, signedPdfUrls } from "@/lib/courses";
 import { getQuizzesByModule } from "@/lib/quizzes";
 import { requireUser } from "@/lib/session";
 import { ConfirmButton } from "@/components/confirm-button";
+import { EnrollmentPanel } from "@/components/enrollment-panel";
 import { MoveButtons } from "@/components/move-buttons";
+import { getEnrollmentPanel } from "@/lib/enrollments";
 import { deleteContent, deleteCourse, deleteModule, duplicateCourse, moveContent, moveModule, setCourseStatus } from "../actions";
 import { AddContentForm, AddModuleForm, EditContentForm, EditCourseForm, RenameModuleForm } from "./course-forms";
 
@@ -22,6 +24,7 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
   const pdfUrls = await signedPdfUrls(course);
   const quizzes = await getQuizzesByModule(course.modules.map((m) => m.id));
   const published = course.status === "published";
+  const enrollment = await getEnrollmentPanel(course.id);
   const objectives = course.objectives.split("\n").filter((line) => line.trim());
 
   return (
@@ -77,6 +80,8 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
       </div>
 
       <EditCourseForm course={course} />
+
+      <EnrollmentPanel courseId={course.id} published={published} data={enrollment} />
 
       {(course.description || objectives.length > 0) && (
         <Card className="mb-6 grid gap-6 md:grid-cols-2">

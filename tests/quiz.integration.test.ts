@@ -74,6 +74,8 @@ describe.skipIf(!url || !anonKey)("quiz : score, seuil, tentatives, droits (base
     ]);
     const [course] = await insert("courses", trainer, { organization_id: ORG, title: "Parcours de test quiz", status: "published" });
     courseId = course!.id;
+    // Depuis l'étape 10, un apprenant ne voit un parcours que s'il y est inscrit.
+    await insert("enrollments", trainer, { organization_id: ORG, course_id: courseId, learner_id: "a1000000-0000-4000-8000-000000000003" });
     const [module] = await insert("modules", trainer, { organization_id: ORG, course_id: courseId, title: "Module test", position: 1 });
     const [quiz] = await insert("quizzes", trainer, {
       organization_id: ORG, module_id: module!.id, title: "Quiz test", pass_threshold: 70, max_attempts: null, show_correction: true,

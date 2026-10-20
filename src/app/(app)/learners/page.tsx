@@ -47,7 +47,7 @@ export default async function LearnersPage() {
 
       {rows.length === 0 ? (
         <Card className="py-14 text-center text-zinc-600">
-          {courses.length === 0 ? "Aucun parcours publié pour le moment." : "Aucun apprenant pour le moment."}
+          {courses.length === 0 ? "Aucun parcours publié pour le moment." : "Aucun apprenant n'est encore inscrit à un parcours publié."}
         </Card>
       ) : (
         <Card className="overflow-x-auto p-0">
