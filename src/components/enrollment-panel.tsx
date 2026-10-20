@@ -60,9 +60,12 @@ export function EnrollmentPanel({ courseId, published, data }: { courseId: strin
           </form>
           <form action={enrollAllLearners}>
             <input type="hidden" name="courseId" value={courseId} />
-            <button className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
+            <ConfirmButton
+              message={`Inscrire les ${available.length} apprenant${available.length > 1 ? "s" : ""} restant${available.length > 1 ? "s" : ""} à ce parcours ?`}
+              className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+            >
               Inscrire tous les apprenants ({available.length})
-            </button>
+            </ConfirmButton>
           </form>
         </div>
       )}
