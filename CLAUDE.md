@@ -50,7 +50,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 
 ### Phase d'extensions (validée le 2026-10-20, une étape = vérification → commit → explication → pause)
 - [x] **Étape 8a** — Fiabilisation : erreurs d'actions visibles, confirmation avant suppression, page d'erreur — 2026-10-20
-- [ ] **Étape 8** — Quiz : modifier et réordonner les questions après création. Code terminé le 2026-10-20 ; reste à appliquer `0006_update_question.sql` dans Supabase, lancer `npm run test:isolation` et valider à l'écran
+- [x] **Étape 8** — Quiz : modifier et réordonner les questions après création (fonction SQL `update_question`, migration 0006, tests sur base réelle) — 2026-10-20
 - [ ] **Étape 9** — Dupliquer un parcours
 - [ ] **Étape 10** — Inscription des apprenants à un parcours (individuelle ou par groupe) ; l'apprenant ne voit plus que ses parcours (RLS + tests d'isolation)
 - [ ] **Étape 11** — Création / invitation des utilisateurs depuis l'interface (admin) ; touche à la sécurité (clé de service côté serveur uniquement)
