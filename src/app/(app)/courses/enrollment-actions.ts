@@ -10,18 +10,19 @@ const text = (data: FormData, key: string) => String(data.get(key) ?? "");
 // Toutes les actions exigent le droit « gérer les parcours » ; la base le re-vérifie (RLS) et refuse
 // d'inscrire un compte qui n'est pas apprenant ou qui appartient à un autre organisme.
 
-export async function enrollLearner(formData: FormData): Promise<void> {
+export async function enrollLearners(formData: FormData): Promise<void> {
   const user = await requireUser("course:manage");
   const supabase = await createClient();
+  const courseId = text(formData, "courseId");
+  const learnerIds = [...new Set(formData.getAll("learnerId").map(String))];
+  if (learnerIds.length === 0) return;
   // « ignoreDuplicates » : inscrire deux fois la même personne ne fait rien (pas d'erreur).
-  const { error } = await supabase
-    .from("enrollments")
-    .upsert(
-      { organization_id: user.organization.id, course_id: text(formData, "courseId"), learner_id: text(formData, "learnerId"), enrolled_by: user.id },
-      { onConflict: "course_id,learner_id", ignoreDuplicates: true },
-    );
-  if (error) throw new Error("L'inscription n'a pas pu être enregistrée.");
-  revalidatePath(`/courses/${text(formData, "courseId")}`);
+  const { error } = await supabase.from("enrollments").upsert(
+    learnerIds.map((learnerId) => ({ organization_id: user.organization.id, course_id: courseId, learner_id: learnerId, enrolled_by: user.id })),
+    { onConflict: "course_id,learner_id", ignoreDuplicates: true },
+  );
+  if (error) throw new Error("Les inscriptions n'ont pas pu être enregistrées.");
+  revalidatePath(`/courses/${courseId}`);
 }
 
 export async function enrollAllLearners(formData: FormData): Promise<void> {

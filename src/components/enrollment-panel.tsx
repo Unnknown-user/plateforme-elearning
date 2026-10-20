@@ -1,7 +1,8 @@
-import { UserMinus, UserPlus, Users } from "lucide-react";
+import { UserMinus, Users } from "lucide-react";
 import { Card } from "@/components/page-header";
 import { ConfirmButton } from "@/components/confirm-button";
-import { enrollAllLearners, enrollLearner, unenrollLearner } from "@/app/(app)/courses/enrollment-actions";
+import { EnrollSearch } from "@/components/enroll-search";
+import { enrollAllLearners, unenrollLearner } from "@/app/(app)/courses/enrollment-actions";
 import type { EnrollmentPanelData } from "@/lib/enrollments";
 
 /** Inscriptions d'un parcours, côté personnel : qui peut le suivre. */
@@ -42,22 +43,9 @@ export function EnrollmentPanel({ courseId, published, data }: { courseId: strin
 
       {available.length > 0 && (
         <div className="flex flex-wrap items-end gap-3">
-          <form action={enrollLearner} className="flex flex-wrap items-end gap-2">
-            <input type="hidden" name="courseId" value={courseId} />
-            <label className="text-sm font-medium text-zinc-900">
-              Inscrire un apprenant
-              <select name="learnerId" required className="mt-1 block rounded-lg border border-zinc-400 bg-white p-2 text-sm text-zinc-900">
-                {available.map((learner) => (
-                  <option key={learner.id} value={learner.id}>
-                    {learner.fullName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-[var(--brand-contrast)]">
-              <UserPlus className="h-4 w-4" aria-hidden /> Inscrire
-            </button>
-          </form>
+          <div className="w-full max-w-xl">
+            <EnrollSearch courseId={courseId} learners={available} />
+          </div>
           <form action={enrollAllLearners}>
             <input type="hidden" name="courseId" value={courseId} />
             <ConfirmButton
