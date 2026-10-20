@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search, UserPlus } from "lucide-react";
 import { enrollLearners } from "@/app/(app)/courses/enrollment-actions";
-import { filterLearners, sortByFamilyName } from "@/lib/learner-search";
+import { filterLearners, formatFamilyFirst, sortByFamilyName } from "@/lib/learner-search";
 import type { EnrollmentLearner } from "@/lib/enrollments";
 
 /**
@@ -82,7 +82,7 @@ export function EnrollSearch({ courseId, learners }: { courseId: string; learner
               <li key={learner.id}>
                 <label className="flex cursor-pointer items-center gap-3 px-4 py-2 text-sm text-zinc-900 hover:bg-zinc-50">
                   <input type="checkbox" checked={selected.has(learner.id)} onChange={() => toggle(learner.id)} className="h-4 w-4" />
-                  {learner.fullName}
+                  {formatFamilyFirst(learner.fullName)}
                 </label>
               </li>
             ))}

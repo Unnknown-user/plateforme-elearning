@@ -3,6 +3,7 @@ import { Card } from "@/components/page-header";
 import { ConfirmButton } from "@/components/confirm-button";
 import { EnrollSearch } from "@/components/enroll-search";
 import { enrollAllLearners, unenrollLearner } from "@/app/(app)/courses/enrollment-actions";
+import { formatFamilyFirst, sortByFamilyName } from "@/lib/learner-search";
 import type { EnrollmentPanelData } from "@/lib/enrollments";
 
 /** Inscriptions d'un parcours, côté personnel : qui peut le suivre. */
@@ -22,9 +23,9 @@ export function EnrollmentPanel({ courseId, published, data }: { courseId: strin
         <p className="mb-4 rounded-lg border border-dashed border-zinc-300 p-4 text-sm text-zinc-600">Aucun apprenant inscrit pour le moment.</p>
       ) : (
         <ul className="mb-4 divide-y divide-zinc-100 rounded-lg border border-zinc-200">
-          {enrolled.map((learner) => (
+          {sortByFamilyName(enrolled).map((learner) => (
             <li key={learner.id} className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
-              <span className="font-medium text-zinc-900">{learner.fullName}</span>
+              <span className="font-medium text-zinc-900">{formatFamilyFirst(learner.fullName)}</span>
               <form action={unenrollLearner}>
                 <input type="hidden" name="courseId" value={courseId} />
                 <input type="hidden" name="learnerId" value={learner.id} />

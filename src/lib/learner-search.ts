@@ -35,3 +35,16 @@ export function sortByFamilyName<T extends Searchable>(learners: readonly T[]): 
     return familyA.localeCompare(familyB, "fr") || firstA.localeCompare(firstB, "fr");
   });
 }
+
+/**
+ * « Léa Fontaine » -> « FONTAINE Léa » : nom de famille en majuscules, en premier.
+ * Hypothèse : le nom de famille est le dernier mot (le profil n'a qu'un champ « nom complet »).
+ * Un nom de famille composé (« Le Gall ») sera donc coupé ; à corriger en séparant prénom et nom
+ * dans le profil lors de la création des comptes (étape 11).
+ */
+export function formatFamilyFirst(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length < 2) return fullName.trim().toLocaleUpperCase("fr");
+  const family = parts[parts.length - 1]!.toLocaleUpperCase("fr");
+  return `${family} ${parts.slice(0, -1).join(" ")}`;
+}

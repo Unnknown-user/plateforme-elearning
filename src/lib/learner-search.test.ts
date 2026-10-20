@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterLearners, normalizeName, sortByFamilyName } from "./learner-search";
+import { filterLearners, formatFamilyFirst, normalizeName, sortByFamilyName } from "./learner-search";
 
 const learners = [
   { id: "1", fullName: "Léa Fontaine" },
@@ -41,5 +41,16 @@ describe("sortByFamilyName", () => {
     const sorted = sortByFamilyName(learners);
     expect(sorted.map((l) => l.fullName)).toEqual(["Inès Caron", "Léa Fontaine", "Thomas Girard", "Camille Petit"]);
     expect(learners[0]!.fullName).toBe("Léa Fontaine");
+  });
+});
+
+describe("formatFamilyFirst", () => {
+  it("met le nom de famille en majuscules, en premier", () => {
+    expect(formatFamilyFirst("Léa Fontaine")).toBe("FONTAINE Léa");
+    expect(formatFamilyFirst("  Jean  Pierre  Durand ")).toBe("DURAND Jean Pierre");
+  });
+
+  it("gère un nom en un seul mot", () => {
+    expect(formatFamilyFirst("Madonna")).toBe("MADONNA");
   });
 });
