@@ -46,7 +46,20 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 - [x] **Étape 6** — Suivi et traces Qualiopi : contenus terminés, temps passé (plafonné côté base), avancement et statut par parcours, tableau de suivi, export CSV (suivi + résultats aux quiz), attestation de fin de parcours en PDF, mentions légales de l'organisme, apprenants et activité fictifs (`supabase/seed_tracking.sql`) — 2026-10-09
 - [x] **Étape 7** — Page d'accueil publique légère, scénario de démo prospect (`docs/scenario-demo.md`), remise à zéro de la démo (`supabase/reset_demo.sql`), jeu de données de démonstration complet — 2026-10-09
 
-**Le prototype des 5 fonctionnalités est complet.** Prochaine phase : démos auprès de 10-15 prospects, puis la feuille de route ci-dessous avec un développeur professionnel.
+**Le prototype des 5 fonctionnalités est complet.** Avant les démos, Mélissa a validé (2026-10-20) une phase d'extensions, **puis** le déploiement sur Vercel. Ensuite : démos auprès de 10-15 prospects, puis la feuille de route ci-dessous avec un développeur professionnel.
+
+### Phase d'extensions (validée le 2026-10-20, une étape = vérification → commit → explication → pause)
+- [x] **Étape 8a** — Fiabilisation : erreurs d'actions visibles, confirmation avant suppression, page d'erreur — 2026-10-20
+- [ ] **Étape 8** — Quiz : modifier et réordonner les questions après création
+- [ ] **Étape 9** — Dupliquer un parcours
+- [ ] **Étape 10** — Inscription des apprenants à un parcours (individuelle ou par groupe) ; l'apprenant ne voit plus que ses parcours (RLS + tests d'isolation)
+- [ ] **Étape 11** — Création / invitation des utilisateurs depuis l'interface (admin) ; touche à la sécurité (clé de service côté serveur uniquement)
+- [ ] **Étape 12** — Tableau de bord administrateur : taux de complétion, apprenants en retard, parcours les plus suivis
+- [ ] **Étape 13** — Marque blanche poussée : texte d'accueil et bandeau de connexion par organisme, attestation aux couleurs de l'organisme
+- [ ] **Étape 14** — Qualiopi : évaluation à chaud en fin de parcours, registre numéroté des attestations, modèle d'attestation personnalisable (contenu à fournir par Mélissa)
+- [ ] **Étape 15** — Site public : section « Qualiopi » (textes de Mélissa), capture / courte vidéo de démo, référencement de base
+- [ ] **Étape 16** — Déploiement sur Vercel (région Paris) + démo hébergée
+- Hors périmètre **validées mais à planifier après les premières démos** : notifications par e-mail, banque de questions et tirage aléatoire, messagerie formateur-apprenant, page « Offre et tarifs », formulaire de demande de démo (RGPD d'abord), mentions légales et politique de confidentialité.
 
 ## Journal des décisions
 | Date | Décision | Raison |
@@ -78,6 +91,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Page d'accueil publique légère : textes sans chiffre ni témoignage inventé ; contact par lien mailto (adresse dans `NEXT_PUBLIC_CONTACT_EMAIL`), aucun formulaire ni donnée collectée | Éviter toute allégation non vérifiable et tout traitement de données personnelles avant le RGPD |
 | 2026-10-09 | Script `supabase/reset_demo.sql` limité aux deux organismes fictifs | Rejouer la démo à l'identique (tentatives de quiz limitées, couleurs modifiées en direct) |
 | 2026-10-20 | Actions serveur à bouton simple : `assertChanged` lève une erreur si la base échoue ou ignore l'écriture (RLS) ; page `error.tsx` en français ; confirmation avant toute suppression (`ConfirmButton`) | Une suppression refusée paraissait réussie ; un clic accidentel effaçait un parcours entier |
+| 2026-10-20 | Extension du périmètre validée par Mélissa : étapes 8 à 15 (voir « Phase d'extensions »), déploiement Vercel repoussé après elles (étape 16) | Démo plus crédible (inscriptions, invitations, tableau de bord, Qualiopi) ; le périmètre reste les 5 fonctionnalités, étendues |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
