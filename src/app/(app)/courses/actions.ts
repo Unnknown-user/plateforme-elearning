@@ -247,3 +247,29 @@ export async function moveContent(formData: FormData): Promise<void> {
   await reorder("contents", "module_id", text(formData, "moduleId"), text(formData, "contentId"), text(formData, "direction"));
   revalidatePath("/", "layout");
 }
+
+// Duplication : la base copie les lignes en une seule opération (fonction SQL duplicate_course),
+// puis on copie ici les fichiers PDF du stockage. Si une copie de fichier échoue, on supprime la
+// copie entière plutôt que de laisser un parcours dont des PDF seraient introuvables.
+export async function duplicateCourse(formData: FormData): Promise<void> {
+  await requireUser("course:manage");
+  const supabase = await createClient();
+  // La fonction renvoie un seul objet JSON.
+  const { data: raw, error } = await supabase.rpc("duplicate_course", { p_course_id: text(formData, "courseId") });
+  const data = raw as { course_id: string; files: { from: string; to: string }[] } | null;
+  if (error || !data) throw new Error("Le parcours n'a pas pu être dupliqué.");
+
+  const copied: string[] = [];
+  for (const file of data.files) {
+    const { error: copyError } = await supabase.storage.from("course-files").copy(file.from, file.to);
+    if (copyError) {
+      await supabase.from("courses").delete().eq("id", data.course_id);
+      if (copied.length) await supabase.storage.from("course-files").remove(copied);
+      throw new Error("Un fichier PDF n'a pas pu être copié : la duplication a été annulée.");
+    }
+    copied.push(file.to);
+  }
+
+  revalidatePath("/courses");
+  redirect(`/courses/${data.course_id}`);
+}

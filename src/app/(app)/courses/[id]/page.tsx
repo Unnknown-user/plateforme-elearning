@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock, Eye, EyeOff, Globe, Target, Trash2 } from "lucide-react";
+import { ArrowLeft, Clock, Copy, Eye, EyeOff, Globe, Target, Trash2 } from "lucide-react";
 import { ContentView, StatusBadge } from "@/components/course-ui";
 import { Card } from "@/components/page-header";
 import { formatDuration } from "@/lib/content";
@@ -10,7 +10,7 @@ import { getQuizzesByModule } from "@/lib/quizzes";
 import { requireUser } from "@/lib/session";
 import { ConfirmButton } from "@/components/confirm-button";
 import { MoveButtons } from "@/components/move-buttons";
-import { deleteContent, deleteCourse, deleteModule, moveContent, moveModule, setCourseStatus } from "../actions";
+import { deleteContent, deleteCourse, deleteModule, duplicateCourse, moveContent, moveModule, setCourseStatus } from "../actions";
 import { AddContentForm, AddModuleForm, EditContentForm, EditCourseForm, RenameModuleForm } from "./course-forms";
 
 export default async function CourseManagePage({ params }: { params: Promise<{ id: string }> }) {
@@ -53,6 +53,15 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
             <button className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-[var(--brand-contrast)]">
               {published ? <EyeOff className="h-4 w-4" aria-hidden /> : <Globe className="h-4 w-4" aria-hidden />}
               {published ? "Repasser en brouillon" : "Publier"}
+            </button>
+          </form>
+          <form action={duplicateCourse}>
+            <input type="hidden" name="courseId" value={course.id} />
+            <button
+              title="Crée une copie en brouillon : modules, contenus, quiz et PDF"
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+            >
+              <Copy className="h-4 w-4" aria-hidden /> Dupliquer
             </button>
           </form>
           <form action={deleteCourse}>
