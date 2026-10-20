@@ -1,6 +1,7 @@
 import { CheckCircle2, Circle, ListChecks, Trash2 } from "lucide-react";
 import { QUESTION_TYPE_LABELS } from "@/lib/quiz";
 import type { QuizRow } from "@/lib/quizzes";
+import { ConfirmButton } from "@/components/confirm-button";
 import { deleteQuestion, deleteQuiz } from "@/app/(app)/courses/quiz-actions";
 import { AddQuestionForm, CreateQuizForm, QuizSettingsForm } from "@/app/(app)/courses/[id]/quiz-forms";
 
@@ -16,9 +17,12 @@ export function QuizEditor({ moduleId, quiz }: { moduleId: string; quiz: QuizRow
         </h4>
         <form action={deleteQuiz}>
           <input type="hidden" name="quizId" value={quiz.id} />
-          <button className="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50">
+          <ConfirmButton
+            message="Supprimer ce quiz ? Ses questions et les tentatives des apprenants seront effacées."
+            className="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50"
+          >
             <Trash2 className="h-4 w-4" aria-hidden /> Supprimer le quiz
-          </button>
+          </ConfirmButton>
         </form>
       </div>
 
@@ -41,13 +45,13 @@ export function QuizEditor({ moduleId, quiz }: { moduleId: string; quiz: QuizRow
               </p>
               <form action={deleteQuestion}>
                 <input type="hidden" name="questionId" value={question.id} />
-                <button
+                <ConfirmButton
+                  message="Supprimer cette question ?"
                   title="Supprimer la question"
-                  aria-label="Supprimer la question"
                   className="rounded-lg p-1.5 text-zinc-500 hover:bg-red-50 hover:text-red-700"
                 >
                   <Trash2 className="h-4 w-4" aria-hidden />
-                </button>
+                </ConfirmButton>
               </form>
             </div>
             <p className="mb-2 text-xs text-zinc-600">{QUESTION_TYPE_LABELS[question.type]}</p>

@@ -3,16 +3,19 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/session";
+import { assertChanged } from "@/lib/action-error";
 
 // Marquer un contenu comme terminé (ou annuler). La base vérifie que c'est bien un apprenant
 // et que le contenu appartient à un parcours publié de son organisme.
 export async function toggleContent(formData: FormData): Promise<void> {
   await requireUser("course:take");
   const supabase = await createClient();
-  await supabase.rpc("mark_content_done", {
+  const { error } = await supabase.rpc("mark_content_done", {
     p_content_id: String(formData.get("contentId") ?? ""),
     p_done: formData.get("done") === "true",
   });
+  // Pas de lignes à compter pour une fonction SQL : seule l'erreur compte.
+  assertChanged(error, [{}], "Le contenu n'a pas pu être mis à jour.");
   revalidatePath("/", "layout");
 }
 

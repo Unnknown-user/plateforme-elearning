@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/session";
 import { validateQuestion, validateQuizSettings } from "@/lib/quiz";
+import { assertChanged } from "@/lib/action-error";
 import type { FormState } from "./actions";
 
 const text = (data: FormData, key: string) => String(data.get(key) ?? "");
@@ -64,7 +65,8 @@ export async function updateQuizSettings(_prev: FormState, formData: FormData): 
 export async function deleteQuiz(formData: FormData): Promise<void> {
   await requireUser("course:manage");
   const supabase = await createClient();
-  await supabase.from("quizzes").delete().eq("id", text(formData, "quizId"));
+  const { data, error } = await supabase.from("quizzes").delete().eq("id", text(formData, "quizId")).select("id");
+  assertChanged(error, data, "Le quiz n'a pas pu être supprimé.");
   revalidatePath("/", "layout");
 }
 
@@ -136,6 +138,7 @@ export async function addQuestion(_prev: FormState, formData: FormData): Promise
 export async function deleteQuestion(formData: FormData): Promise<void> {
   await requireUser("course:manage");
   const supabase = await createClient();
-  await supabase.from("questions").delete().eq("id", text(formData, "questionId"));
+  const { data, error } = await supabase.from("questions").delete().eq("id", text(formData, "questionId")).select("id");
+  assertChanged(error, data, "La question n'a pas pu être supprimée.");
   revalidatePath("/", "layout");
 }

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/session";
 import { validateContent, validateCourse, validatePdf, validateTitle } from "@/lib/content";
 import { isDirection, moveItem } from "@/lib/ordering";
+import { assertChanged } from "@/lib/action-error";
 
 export type FormState = { error: string | null; saved?: boolean };
 
@@ -47,14 +48,16 @@ export async function setCourseStatus(formData: FormData): Promise<void> {
   const courseId = text(formData, "courseId");
   const status = text(formData, "status") === "published" ? "published" : "draft";
   const supabase = await createClient();
-  await supabase.from("courses").update({ status }).eq("id", courseId);
+  const { data, error } = await supabase.from("courses").update({ status }).eq("id", courseId).select("id");
+  assertChanged(error, data, "Le statut du parcours n'a pas pu être modifié.");
   revalidatePath("/", "layout");
 }
 
 export async function deleteCourse(formData: FormData): Promise<void> {
   await requireUser("course:manage");
   const supabase = await createClient();
-  await supabase.from("courses").delete().eq("id", text(formData, "courseId"));
+  const { data, error } = await supabase.from("courses").delete().eq("id", text(formData, "courseId")).select("id");
+  assertChanged(error, data, "Le parcours n'a pas pu être supprimé.");
   revalidatePath("/courses");
   redirect("/courses");
 }
@@ -85,7 +88,8 @@ export async function addModule(_prev: FormState, formData: FormData): Promise<F
 export async function deleteModule(formData: FormData): Promise<void> {
   await requireUser("course:manage");
   const supabase = await createClient();
-  await supabase.from("modules").delete().eq("id", text(formData, "moduleId"));
+  const { data, error } = await supabase.from("modules").delete().eq("id", text(formData, "moduleId")).select("id");
+  assertChanged(error, data, "Le module n'a pas pu être supprimé.");
   revalidatePath(`/courses/${text(formData, "courseId")}`);
 }
 
@@ -144,7 +148,8 @@ export async function deleteContent(formData: FormData): Promise<void> {
   const supabase = await createClient();
   const contentId = text(formData, "contentId");
   const { data } = await supabase.from("contents").select("file_path").eq("id", contentId).maybeSingle<{ file_path: string | null }>();
-  await supabase.from("contents").delete().eq("id", contentId);
+  const { data: deleted, error } = await supabase.from("contents").delete().eq("id", contentId).select("id");
+  assertChanged(error, deleted, "Le contenu n'a pas pu être supprimé.");
   if (data?.file_path) await supabase.storage.from("course-files").remove([data.file_path]);
   revalidatePath(`/courses/${text(formData, "courseId")}`);
 }
@@ -241,13 +246,14 @@ async function reorder(table: "modules" | "contents", parentColumn: string, pare
     .order("position")
     .order("id")
     .returns<{ id: string; position: number }[]>();
-  if (!data) return;
+  if (!data) throw new Error("Le nouvel ordre n'a pas pu être enregistré.");
 
   const ids = data.map((row) => row.id);
   const reordered = moveItem(ids, ids.indexOf(itemId), direction);
   for (let i = 0; i < reordered.length; i++) {
     if (reordered[i] !== ids[i] || data[i]!.position !== i + 1) {
-      await supabase.from(table).update({ position: i + 1 }).eq("id", reordered[i]!);
+      const { error } = await supabase.from(table).update({ position: i + 1 }).eq("id", reordered[i]!);
+      if (error) throw new Error("Le nouvel ordre n'a pas pu être enregistré.");
     }
   }
 }

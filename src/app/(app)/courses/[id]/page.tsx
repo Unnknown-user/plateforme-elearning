@@ -8,6 +8,7 @@ import { QuizEditor } from "@/components/quiz-editor";
 import { getCourse, signedPdfUrls } from "@/lib/courses";
 import { getQuizzesByModule } from "@/lib/quizzes";
 import { requireUser } from "@/lib/session";
+import { ConfirmButton } from "@/components/confirm-button";
 import { deleteContent, deleteCourse, deleteModule, moveContent, moveModule, setCourseStatus } from "../actions";
 import { AddContentForm, AddModuleForm, EditContentForm, EditCourseForm, RenameModuleForm } from "./course-forms";
 
@@ -55,9 +56,12 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
           </form>
           <form action={deleteCourse}>
             <input type="hidden" name="courseId" value={course.id} />
-            <button className="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50">
+            <ConfirmButton
+              message="Supprimer ce parcours ? Ses modules, contenus, quiz et résultats seront définitivement effacés."
+              className="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+            >
               <Trash2 className="h-4 w-4" aria-hidden /> Supprimer
-            </button>
+            </ConfirmButton>
           </form>
         </div>
       </div>
@@ -109,13 +113,13 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
                 <form action={deleteModule}>
                   <input type="hidden" name="moduleId" value={module.id} />
                   <input type="hidden" name="courseId" value={course.id} />
-                  <button
+                  <ConfirmButton
+                    message="Supprimer ce module et tout son contenu (y compris son quiz) ?"
                     title="Supprimer le module"
-                    aria-label="Supprimer le module"
                     className="rounded-lg p-2 text-zinc-500 hover:bg-red-50 hover:text-red-700"
                   >
                     <Trash2 className="h-4 w-4" aria-hidden />
-                  </button>
+                  </ConfirmButton>
                 </form>
               </div>
             </div>
@@ -138,9 +142,12 @@ export default async function CourseManagePage({ params }: { params: Promise<{ i
                     <form action={deleteContent}>
                       <input type="hidden" name="contentId" value={content.id} />
                       <input type="hidden" name="courseId" value={course.id} />
-                      <button className="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50">
+                      <ConfirmButton
+                        message="Supprimer ce contenu ?"
+                        className="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                      >
                         <Trash2 className="h-4 w-4" aria-hidden /> Supprimer
-                      </button>
+                      </ConfirmButton>
                     </form>
                   </div>
                 </div>

@@ -77,6 +77,7 @@ Ajout validé : une **page d'accueil publique légère** (option A, dernière é
 | 2026-10-09 | Tests réels : jetons de connexion mis en cache (`tests/auth-helper.ts`) | Supabase limite les connexions rapprochées (erreur 429) |
 | 2026-10-09 | Page d'accueil publique légère : textes sans chiffre ni témoignage inventé ; contact par lien mailto (adresse dans `NEXT_PUBLIC_CONTACT_EMAIL`), aucun formulaire ni donnée collectée | Éviter toute allégation non vérifiable et tout traitement de données personnelles avant le RGPD |
 | 2026-10-09 | Script `supabase/reset_demo.sql` limité aux deux organismes fictifs | Rejouer la démo à l'identique (tentatives de quiz limitées, couleurs modifiées en direct) |
+| 2026-10-20 | Actions serveur à bouton simple : `assertChanged` lève une erreur si la base échoue ou ignore l'écriture (RLS) ; page `error.tsx` en français ; confirmation avant toute suppression (`ConfirmButton`) | Une suppression refusée paraissait réussie ; un clic accidentel effaçait un parcours entier |
 | 2026-10-09 | `@types/node` en v24 | Aligné sur Node 24 ; évite un conflit de dépendances avec Vitest |
 
 ## Plus tard (hors périmètre)
